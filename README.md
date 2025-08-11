@@ -55,8 +55,8 @@ export OVH_ENDPOINT=ovh-eu  # or ovh-ca, ovh-us
 export OVH_APPLICATION_KEY=your_application_key
 export OVH_APPLICATION_SECRET=your_application_secret
 export OVH_CONSUMER_KEY=your_consumer_key
+export PULUMI_CONFIG_PASSPHRASE=
 ```
-
 ### Get Your Project ID
 
 You'll need your OVHcloud project ID (service name). You can find this in the OVHcloud Control Panel under Public Cloud > Project Management.
