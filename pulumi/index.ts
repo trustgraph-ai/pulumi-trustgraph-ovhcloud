@@ -1,4 +1,4 @@
-import * as ovh from '@ovh/pulumi-ovh';
+import * as ovh from '@ovhcloud/pulumi-ovh';
 import * as pulumi from '@pulumi/pulumi';
 import * as k8s from '@pulumi/kubernetes';
 import * as fs from 'fs';
@@ -43,20 +43,18 @@ const subnet = new ovh.cloudproject.NetworkPrivateSubnet(
 );
 
 // Create a K8s cluster
+// Note: Starting without private network configuration to simplify deployment
+// You can add private network configuration later if needed
 const cluster = new ovh.cloudproject.Kube(
     "cluster",
     {
         serviceName: serviceName,
         name: prefix + "-cluster",
         region: region,
-        version: "1.32", // Check OVHcloud for latest supported versions
-        privateNetworkId: privateNetwork.id,
-        privateNetworkConfiguration: {
-            defaultVrackGateway: "10.0.0.1",
-            privateNetworkRoutingAsDefault: true,
-        },
+        // FIXME: 1.33 is recommended
+        version: "1.31", // Using a stable version
     },
-    { provider: provider, dependsOn: [subnet] }
+    { provider: provider }
 );
 
 // Create a nodepool for the cluster
@@ -73,6 +71,7 @@ const nodePool = new ovh.cloudproject.KubeNodePool(
     },
     { provider: provider }
 );
+
 
 // Get the kubeconfig for the cluster
 const kubeconfig = pulumi.all([
@@ -102,6 +101,8 @@ const serviceAccount = new ovh.cloudproject.User(
     { provider: provider, dependsOn: [ nodePool ] }
 );
 
+/*
+
 // Create S3 credentials for the service account (if needed for AI endpoints)
 const s3Credentials = new ovh.cloudproject.UserS3Credential(
     "s3-credentials",
@@ -111,6 +112,8 @@ const s3Credentials = new ovh.cloudproject.UserS3Credential(
     },
     { provider: provider }
 );
+
+*/
 
 // OVHcloud AI Endpoints URL construction
 // The AI Endpoints URL is typically: https://[model-name].endpoints.kepler.ai.cloud.ovh.net
@@ -195,3 +198,4 @@ export const clusterEndpoint = cluster.kubeconfig.apply(k => {
 });
 export const aiUrl = aiEndpointUrl;
 export const networkId = privateNetwork.id;
+

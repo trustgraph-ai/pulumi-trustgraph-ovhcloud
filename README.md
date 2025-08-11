@@ -59,7 +59,8 @@ export PULUMI_CONFIG_PASSPHRASE=
 ```
 ### Get Your Project ID
 
-You'll need your OVHcloud project ID (service name). You can find this in the OVHcloud Control Panel under Public Cloud > Project Management.
+You'll need your OVHcloud project ID (service name). You can find this in the OVHcloud Control Panel under Public Cloud.  It's the hext string
+in the top LHS of the screen.
 
 ## Deploy
 
