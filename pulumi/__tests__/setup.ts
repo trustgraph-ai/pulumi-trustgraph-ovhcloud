@@ -8,3 +8,6 @@ global.console.log = jest.fn();
 
 // Global test timeout
 jest.setTimeout(10000);
+
+// Increase max listeners to avoid warnings
+process.setMaxListeners(20);
