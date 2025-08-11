@@ -3,7 +3,7 @@ import * as pulumi from '@pulumi/pulumi';
 import * as k8s from '@pulumi/kubernetes';
 import * as fs from 'fs';
 
-import { prefix, region, nodeSize, nodeCount, serviceName, aiModel } from './config';
+import { prefix, region, nodeSize, nodeCount, serviceName, aiModel, aiEndpointsToken, aiEndpoint } from './config';
 
 // OVHcloud provider
 const provider = new ovh.Provider(
@@ -116,8 +116,9 @@ const s3Credentials = new ovh.cloudproject.UserS3Credential(
 */
 
 // OVHcloud AI Endpoints URL construction
-// The AI Endpoints URL is typically: https://[model-name].endpoints.kepler.ai.cloud.ovh.net
-const aiEndpointUrl = pulumi.interpolate`https://${aiModel}.endpoints.kepler.ai.cloud.ovh.net`;
+// AI Endpoints use OpenAI-compatible API format
+// Base URL: https://mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net/api/openai_compat/v1
+const aiEndpointUrl = pulumi.interpolate`https://${aiEndpoint}/api/openai_compat/v1`;
 
 // Write the kubeconfig to a file
 kubeconfig.apply(
@@ -168,7 +169,7 @@ const gatewaySecret = new k8s.core.v1.Secret(
 );
 
 // Generate an AI endpoint secret - URL plus bearer token
-// For OVHcloud AI Endpoints, you typically need a bearer token
+// OVHcloud AI Endpoints uses OpenAI-compatible API with bearer token authentication
 const endpointSecret = new k8s.core.v1.Secret(
     "ai-secret",
     {
@@ -177,9 +178,8 @@ const endpointSecret = new k8s.core.v1.Secret(
             namespace: "trustgraph"
         },
         stringData: {
-            // OVHcloud AI Endpoints uses bearer tokens for authentication
-            // The token would be generated through OVHcloud console or API
-            "openai-token": serviceAccount.password || "YOUR_AI_ENDPOINT_TOKEN",
+            // AI Endpoints token from https://endpoints.ai.cloud.ovh.net/
+            "openai-token": aiEndpointsToken,
             "openai-url": aiEndpointUrl,
         },
     },

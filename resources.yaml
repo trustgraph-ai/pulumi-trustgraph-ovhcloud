@@ -2565,7 +2565,7 @@ items:
           - -t
           - '0.300'
           - -m
-          - mistral-nemo-instruct-2407
+          - Mistral-Nemo-Instruct-2407
           env:
           - name: OPENAI_TOKEN
             valueFrom:
@@ -2631,7 +2631,7 @@ items:
           - -t
           - '0.300'
           - -m
-          - mistral-nemo-instruct-2407
+          - Mistral-Nemo-Instruct-2407
           env:
           - name: OPENAI_TOKEN
             valueFrom:

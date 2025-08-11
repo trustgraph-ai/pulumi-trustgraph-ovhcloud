@@ -59,8 +59,15 @@ export PULUMI_CONFIG_PASSPHRASE=
 ```
 ### Get Your Project ID
 
-You'll need your OVHcloud project ID (service name). You can find this in the OVHcloud Control Panel under Public Cloud.  It's the hext string
+You'll need your OVHcloud project ID (service name). You can find this in the OVHcloud Control Panel under Public Cloud. It's the hex string
 in the top LHS of the screen.
+
+### Create AI Endpoints Token
+
+1. Go to https://endpoints.ai.cloud.ovh.net/
+2. Click on "Get your free token"
+3. Follow the process to create your AI Endpoints access token
+4. Keep this token safe - you'll need it for the deployment
 
 ## Deploy
 
@@ -99,6 +106,7 @@ Edit `Pulumi.ovhcloud.yaml` and update the following values:
 - `trustgraph-ovhcloud:ai-model` - AI model to use (default: mistral-nemo-instruct-2407)
 - `trustgraph-ovhcloud:node-size` - Node flavor (default: b2-15)
 - `trustgraph-ovhcloud:node-count` - Number of nodes (default: 2)
+- `trustgraph-ovhcloud:ai-endpoints-token` - Your AI Endpoints access token (encrypted)
 
 Available AI models in OVHcloud AI Endpoints include:
 - `mistral-nemo-instruct-2407`
@@ -118,6 +126,14 @@ Available node flavors:
 You can edit `resources.yaml` to customize what gets deployed to the cluster.
 The resources.yaml file was created using the TrustGraph config portal,
 so you can re-generate your own.
+
+### Set AI Endpoints Token
+
+Before deploying, set your AI Endpoints token:
+
+```bash
+pulumi config set --secret trustgraph-ovhcloud:ai-endpoints-token YOUR_AI_ENDPOINTS_TOKEN
+```
 
 ### Deploy the Infrastructure
 
