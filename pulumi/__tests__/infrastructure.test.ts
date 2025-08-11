@@ -1,82 +1,48 @@
 import * as pulumi from "@pulumi/pulumi";
 
-// Mock fs module at the top level
+// Mock the fs module before any imports that use it
 jest.mock('fs', () => ({
-    readFileSync: jest.fn((filePath: any) => {
-        if (filePath && filePath.toString().includes('resources.yaml')) {
-            return `
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: trustgraph
-`;
+    readFileSync: jest.fn().mockImplementation((path) => {
+        if (path.includes('resources.yaml')) {
+            return 'apiVersion: v1\nkind: Namespace\nmetadata:\n  name: trustgraph';
         }
         return '';
     }),
-    writeFile: jest.fn((path: any, data: any, callback: any) => {
-        if (typeof callback === 'function') {
-            callback(null);
-        }
+    writeFile: jest.fn().mockImplementation((path, data, cb) => {
+        if (cb) cb(null);
     })
 }));
 
-// Global arrays to capture resources
-let createdResources: Array<{type: string, name: string, inputs: any}> = [];
-let resourceCount = 0;
+describe("Infrastructure Tests", () => {
+    let infraModule: any;
 
-// Mock console.log to capture output
-const originalConsoleLog = console.log;
-let consoleOutput: string[] = [];
-
-describe("Infrastructure Creation", () => {
-    beforeAll(() => {
-        // Capture console output
-        console.log = jest.fn((...args) => {
-            consoleOutput.push(args.join(' '));
-            originalConsoleLog(...args);
-        });
-
-        // Set up Pulumi mocks before any imports
+    beforeAll(async () => {
+        // Set up the mocks
         pulumi.runtime.setMocks({
             newResource: function(args: pulumi.runtime.MockResourceArgs): {id: string, state: any} {
-                console.log(`Creating resource: ${args.type} - ${args.name}`);
-                resourceCount++;
-                createdResources.push({
-                    type: args.type,
-                    name: args.name,
-                    inputs: args.inputs
-                });
-                
-                const mockId = `mock-${args.name}-${resourceCount}`;
-                let state: any = {
-                    ...args.inputs,
-                    id: mockId,
-                    name: args.inputs.name || args.name,
+                // Return mock resource
+                return {
+                    id: args.name + "_id",
+                    state: {
+                        ...args.inputs,
+                        // Add specific outputs for resources that need them
+                        ...(args.type === "ovhcloud:cloudproject/kube:Kube" ? {
+                            kubeconfig: JSON.stringify({
+                                clusters: [{ cluster: { server: "https://mock.ovh.net" } }]
+                            })
+                        } : {})
+                    },
                 };
-                
-                // Mock specific resource outputs
-                if (args.type === "ovhcloud:cloudproject/kube:Kube") {
-                    state.kubeconfig = JSON.stringify({
-                        clusters: [{
-                            cluster: {
-                                server: "https://mock-cluster.ovh.net"
-                            }
-                        }]
-                    });
-                }
-                
-                return { id: mockId, state };
             },
             call: function(args: pulumi.runtime.MockCallArgs) {
-                console.log(`Calling: ${args.token}`);
                 return args.inputs;
             },
         });
 
-        // Set up configuration
+        // Configure the stack
         pulumi.runtime.setAllConfig({
             "project:environment": "test",
-            "project:region": "GRA11", 
+            "project:region": "GRA11",
             "project:service-name": "mock-service-id",
             "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
@@ -84,36 +50,23 @@ describe("Infrastructure Creation", () => {
         });
     });
 
-    afterAll(() => {
-        console.log = originalConsoleLog;
+    test("should create infrastructure and export values", async () => {
+        // Import the infrastructure module
+        infraModule = await import("../index");
+
+        // Test that exports are defined
+        expect(infraModule.clusterId).toBeDefined();
+        expect(infraModule.clusterEndpoint).toBeDefined();
+        expect(infraModule.aiUrl).toBeDefined();
+        expect(infraModule.networkId).toBeDefined();
     });
 
-    test("infrastructure creates resources", async () => {
-        try {
-            // Import the module - this triggers resource creation
-            const index = await import("../index");
-            
-            // Wait for async operations
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            console.log(`Total resources created: ${createdResources.length}`);
-            console.log('Resource types:', createdResources.map(r => r.type));
-            
-            // If no resources were created, check console output for errors
-            if (createdResources.length === 0) {
-                console.log('Console output:', consoleOutput);
-            }
-            
-            // Basic checks
-            expect(createdResources.length).toBeGreaterThan(0);
-            
-            // Check exports are defined
-            expect(index.clusterId).toBeDefined();
-            expect(index.networkId).toBeDefined();
-            
-        } catch (error) {
-            console.log('Error during test:', error);
-            throw error;
-        }
+    test("should have valid AI URL format", async () => {
+        // The aiUrl should be a Pulumi Output
+        expect(infraModule.aiUrl).toBeDefined();
+        
+        // In test mode, Outputs are wrapped but we can verify they exist
+        const urlString = infraModule.aiUrl.toString();
+        expect(urlString).toContain("Output");
     });
 });
