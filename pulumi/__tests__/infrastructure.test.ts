@@ -12,7 +12,9 @@ let resourceCount = 0;
 describe("Infrastructure Creation", () => {
     beforeAll(() => {
         // Mock file system
-        mockedFs.readFileSync.mockReturnValue(`
+        mockedFs.readFileSync.mockImplementation((filePath: any, options: any) => {
+            if (filePath.includes('resources.yaml')) {
+                return `
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -25,13 +27,27 @@ metadata:
   namespace: trustgraph
 spec:
   replicas: 1
-        `);
+`;
+            }
+            // Return empty string for other files
+            return '';
+        });
+
+        // Mock fs.writeFile for kubeconfig
+        mockedFs.writeFile = jest.fn((path, data, callback) => {
+            if (typeof callback === 'function') {
+                callback(null);
+            }
+        }) as any;
         
         // Set up configuration
         pulumi.runtime.setAllConfig({
             "project:environment": "test",
-            "project:region": "fr-par", 
-            "project:ai-model": "llama-3.1-8b-instruct",
+            "project:region": "GRA11", 
+            "project:service-name": "mock-service-id",
+            "project:ai-model": "mistral-nemo-instruct-2407",
+            "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
+            "project:ai-endpoints-token": "mock-token",
         });
         
         // Set up mocks to capture resource creation
@@ -53,26 +69,25 @@ spec:
                 };
                 
                 // Mock specific resource outputs
-                if (args.type === "scaleway:kubernetes/cluster:Cluster") {
-                    state.kubeconfigs = [{
-                        configFile: "mock-kubeconfig-content",
-                        clusterId: mockId,
-                    }];
+                if (args.type === "ovhcloud:cloudproject/kube:Kube") {
+                    state.kubeconfig = JSON.stringify({
+                        clusters: [{
+                            cluster: {
+                                server: "https://mock-cluster.ovh.net"
+                            }
+                        }]
+                    });
                 }
                 
-                if (args.type === "scaleway:iam/apiKey:ApiKey") {
-                    state.secretKey = "mock-secret-key-value";
+                if (args.type === "ovhcloud:cloudproject/user:User") {
+                    state.id = mockId;
+                    state.username = "mock-username";
+                    state.password = "mock-password";
                 }
                 
                 return { id: mockId, state };
             },
             call: function(args: pulumi.runtime.MockCallArgs) {
-                if (args.token === "scaleway:account/getProject:getProject") {
-                    return {
-                        id: "mock-project-id-12345",
-                        name: "mock-project",
-                    };
-                }
                 return args.inputs;
             },
         });
@@ -88,38 +103,49 @@ spec:
         // Verify that resources were created
         expect(createdResources.length).toBeGreaterThan(0);
         
-        // Check for essential Scaleway resources
-        const provider = createdResources.find(r => r.type === "pulumi:providers:scaleway");
-        const network = createdResources.find(r => r.type === "scaleway:network/privateNetwork:PrivateNetwork");
-        const cluster = createdResources.find(r => r.type === "scaleway:kubernetes/cluster:Cluster");
-        const nodePool = createdResources.find(r => r.type === "scaleway:kubernetes/pool:Pool");
-        const iamApp = createdResources.find(r => r.type === "scaleway:iam/application:Application");
-        const policy = createdResources.find(r => r.type === "scaleway:iam/policy:Policy");
-        const apiKey = createdResources.find(r => r.type === "scaleway:iam/apiKey:ApiKey");
+        // Check for essential OVHCloud resources
+        const provider = createdResources.find(r => r.type === "pulumi:providers:ovhcloud");
+        const network = createdResources.find(r => r.type === "ovhcloud:cloudproject/networkPrivate:NetworkPrivate");
+        const subnet = createdResources.find(r => r.type === "ovhcloud:cloudproject/networkPrivateSubnet:NetworkPrivateSubnet");
+        const cluster = createdResources.find(r => r.type === "ovhcloud:cloudproject/kube:Kube");
+        const nodePool = createdResources.find(r => r.type === "ovhcloud:cloudproject/kubeNodePool:KubeNodePool");
+        const serviceAccount = createdResources.find(r => r.type === "ovhcloud:cloudproject/user:User");
         
         // Test resource existence
         expect(provider).toBeDefined();
         expect(network).toBeDefined();
+        expect(subnet).toBeDefined();
         expect(cluster).toBeDefined();
         expect(nodePool).toBeDefined();
-        expect(iamApp).toBeDefined();
-        expect(policy).toBeDefined();
-        expect(apiKey).toBeDefined();
+        expect(serviceAccount).toBeDefined();
         
         // Test resource naming
         expect(cluster?.inputs.name).toBe("trustgraph-test-cluster");
         expect(nodePool?.inputs.name).toBe("trustgraph-test-pool");
-        expect(iamApp?.inputs.name).toBe("TrustGraph");
-        expect(apiKey?.inputs.description).toBe("TrustGraph AI key");
+        expect(network?.inputs.name).toBe("trustgraph-test-network");
+        expect(serviceAccount?.inputs.description).toBe("TrustGraph AI service account");
         
         // Test cluster configuration
-        expect(cluster?.inputs.version).toBe("1.32.3");
-        expect(cluster?.inputs.cni).toBe("cilium");
-        expect(cluster?.inputs.deleteAdditionalResources).toBe(false);
+        expect(cluster?.inputs.region).toBe("GRA11");
+        expect(cluster?.inputs.version).toBe("1.31");
+        expect(cluster?.inputs.serviceName).toBe("mock-service-id");
         
         // Test node pool configuration
-        expect(nodePool?.inputs.nodeType).toBe("DEV1-L");
-        expect(nodePool?.inputs.size).toBe(2);
+        expect(nodePool?.inputs.flavorName).toBe("b2-15");
+        expect(nodePool?.inputs.desiredNodes).toBe(2);
+        expect(nodePool?.inputs.minNodes).toBe(2);
+        expect(nodePool?.inputs.maxNodes).toBe(4);
+        
+        // Test network configuration
+        expect(network?.inputs.regions).toContain("GRA11");
+        expect(network?.inputs.vlanId).toBe(0);
+        
+        // Test subnet configuration
+        expect(subnet?.inputs.start).toBe("10.0.0.100");
+        expect(subnet?.inputs.end).toBe("10.0.0.200");
+        expect(subnet?.inputs.network).toBe("10.0.0.0/24");
+        expect(subnet?.inputs.dhcp).toBe(true);
+        expect(subnet?.inputs.noGateway).toBe(false);
         
         // Test Kubernetes secrets
         const secrets = createdResources.filter(r => r.type === "kubernetes:core/v1:Secret");
@@ -131,6 +157,59 @@ spec:
         expect(gatewaySecret?.inputs.metadata?.namespace).toBe("trustgraph");
         expect(aiSecret?.inputs.metadata?.namespace).toBe("trustgraph");
         
+        // Test that AI secret contains correct keys
+        expect(aiSecret?.inputs.stringData).toHaveProperty("openai-token");
+        expect(aiSecret?.inputs.stringData).toHaveProperty("openai-url");
+        
+        // Test Kubernetes provider
+        const k8sProvider = createdResources.find(r => r.type === "pulumi:providers:kubernetes");
+        expect(k8sProvider).toBeDefined();
+        
+        // Test ConfigGroup for resources
+        const configGroup = createdResources.find(r => r.type === "kubernetes:yaml/v2:ConfigGroup");
+        expect(configGroup).toBeDefined();
+        expect(configGroup?.inputs.skipAwait).toBe(true);
+        
         // console.log(`Created ${createdResources.length} resources:`, createdResources.map(r => r.type));
+    });
+
+    test("resources are created with correct dependencies", async () => {
+        // Re-import to check dependencies
+        await import("../index");
+        
+        // Find resources to check dependencies
+        const cluster = createdResources.find(r => r.type === "ovhcloud:cloudproject/kube:Kube");
+        const nodePool = createdResources.find(r => r.type === "ovhcloud:cloudproject/kubeNodePool:KubeNodePool");
+        const serviceAccount = createdResources.find(r => r.type === "ovhcloud:cloudproject/user:User");
+        
+        // Node pool should depend on cluster
+        expect(nodePool?.inputs.kubeId).toBeDefined();
+        
+        // Service account should be created after nodePool
+        // (This is harder to test with mocks, but we can check it exists)
+        expect(serviceAccount).toBeDefined();
+    });
+
+    test("kubeconfig file is written", async () => {
+        await import("../index");
+        
+        // Wait for async operations
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Check that writeFile was called for kubeconfig
+        expect(mockedFs.writeFile).toHaveBeenCalled();
+        expect(mockedFs.writeFile).toHaveBeenCalledWith(
+            "kube.cfg",
+            expect.any(String),
+            expect.any(Function)
+        );
+    });
+
+    test("AI endpoint URL is correctly constructed", async () => {
+        const index = await import("../index");
+        
+        // The aiUrl export should be properly formatted
+        const aiUrl = await index.aiUrl.promise();
+        expect(aiUrl).toBe("https://mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net/api/openai_compat/v1");
     });
 });

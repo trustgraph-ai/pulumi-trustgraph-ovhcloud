@@ -1,27 +1,10 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as pulumi from "@pulumi/pulumi";
 
-// Mock fs.readFileSync for resources.yaml
-jest.mock('fs');
-const mockedFs = fs as jest.Mocked<typeof fs>;
+// Set up Pulumi runtime for testing
+pulumi.runtime.setConfig("project:name", "trustgraph-ovhcloud");
 
-mockedFs.readFileSync.mockImplementation((filePath: any, options: any) => {
-    if (filePath.includes('resources.yaml')) {
-        return `
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: trustgraph
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: test-config
-  namespace: trustgraph
-data:
-  test: "value"
-`;
-    }
-    // Call the original implementation for other files
-    return jest.requireActual('fs').readFileSync(filePath, options);
-});
+// Mock console.log to reduce test output noise
+global.console.log = jest.fn();
+
+// Global test timeout
+jest.setTimeout(10000);
