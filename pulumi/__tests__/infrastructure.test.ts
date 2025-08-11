@@ -209,7 +209,7 @@ spec:
         const index = await import("../index");
         
         // The aiUrl export should be properly formatted
-        const aiUrl = await index.aiUrl.promise();
-        expect(aiUrl).toBe("https://mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net/api/openai_compat/v1");
+        // In mocked Pulumi, outputs are resolved synchronously
+        expect(index.aiUrl).toBe("https://mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net/api/openai_compat/v1");
     });
 });

@@ -14,10 +14,7 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-  },
-  globals: {
-    'ts-jest': {
+    '^.+\\.ts$': ['ts-jest', {
       tsconfig: {
         // TypeScript options for tests
         target: 'es2018',
@@ -28,6 +25,6 @@ module.exports = {
         skipLibCheck: true,
         forceConsistentCasingInFileNames: true,
       },
-    },
+    }],
   },
 };
