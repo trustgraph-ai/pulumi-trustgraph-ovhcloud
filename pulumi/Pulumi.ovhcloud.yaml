@@ -1,0 +1,8 @@
+encryptionsalt: v1:G0sdswyspGE=:v1:qvr//j1wOQ/TNYdn:+RDSqqZc8RK/NTKkMh0paajyuXmSgw==
+config:
+  trustgraph-ovhcloud:environment: dev
+  trustgraph-ovhcloud:region: GRA11
+  trustgraph-ovhcloud:service-name: YOUR_OVHCLOUD_PROJECT_ID
+  trustgraph-ovhcloud:ai-model: mistral-nemo-instruct-2407
+  trustgraph-ovhcloud:node-size: b2-15
+  trustgraph-ovhcloud:node-count: 2
