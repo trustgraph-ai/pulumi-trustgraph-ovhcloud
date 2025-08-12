@@ -45,7 +45,7 @@
         "parameters": {
             "temperature": 0.3,
             "max-output-tokens": 4096,
-            "model": "mistral-nemo-instruct-2407"
+            "model": "Mistral-Nemo-Instruct-2407"
         }
     },
     {
@@ -53,7 +53,7 @@
         "parameters": {
             "temperature": 0.3,
             "max-output-tokens": 4096,
-            "model": "mistral-nemo-instruct-2407"
+            "model": "Mistral-Nemo-Instruct-2407"
         }
     },
     {
