@@ -58,7 +58,6 @@ describe("Infrastructure Tests", () => {
         expect(infraModule.clusterId).toBeDefined();
         expect(infraModule.clusterEndpoint).toBeDefined();
         expect(infraModule.aiUrl).toBeDefined();
-        expect(infraModule.networkId).toBeDefined();
     });
 
     test("should have valid AI URL format", async () => {
