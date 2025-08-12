@@ -18,6 +18,10 @@ TrustGraph using Kubernetes secrets.
 
 The Pulumi configuration uses OVHcloud AI Endpoints with Mistral Nemo Instruct model by default.
 
+This project uses the https://github.com/ovh/pulumi-ovh project which at the
+time of writing does not support provisioning keys for AI endpoints, so
+you have to create this key yourself using the console.
+
 ## How it works
 
 This uses Pulumi which is a deployment framework, similar to Terraform but:

@@ -124,11 +124,8 @@ describe("Resource Creation Tests", () => {
         // Note: Using actual types from the console output
         const expectedResources = [
             "pulumi:providers:ovh",
-            "ovh:CloudProject/networkPrivate:NetworkPrivate",
-            "ovh:CloudProject/networkPrivateSubnet:NetworkPrivateSubnet",
             "ovh:CloudProject/kube:Kube",
             "ovh:CloudProject/kubeNodePool:KubeNodePool",
-            "ovh:CloudProject/user:User",
             "pulumi:providers:kubernetes",
             "kubernetes:core/v1:Secret",
             "kubernetes:yaml/v2:ConfigGroup"
@@ -145,24 +142,6 @@ describe("Resource Creation Tests", () => {
         const provider = resources.find(r => r.type === "pulumi:providers:ovh");
         expect(provider).toBeDefined();
         expect(provider?.name).toBe("ovhcloud-provider");
-        
-        // Test network
-        const network = resources.find(r => r.type === "ovh:CloudProject/networkPrivate:NetworkPrivate");
-        expect(network).toBeDefined();
-        expect(network?.inputs.name).toBe("trustgraph-test-network");
-        expect(network?.inputs.regions).toContain("GRA11");
-        expect(network?.inputs.vlanId).toBe(0);
-        expect(network?.inputs.serviceName).toBe("mock-service-id");
-        
-        // Test subnet
-        const subnet = resources.find(r => r.type === "ovh:CloudProject/networkPrivateSubnet:NetworkPrivateSubnet");
-        expect(subnet).toBeDefined();
-        expect(subnet?.inputs.region).toBe("GRA11");
-        expect(subnet?.inputs.start).toBe("10.0.0.100");
-        expect(subnet?.inputs.end).toBe("10.0.0.200");
-        expect(subnet?.inputs.network).toBe("10.0.0.0/24");
-        expect(subnet?.inputs.dhcp).toBe(true);
-        expect(subnet?.inputs.noGateway).toBe(false);
     });
 
     test("Kubernetes cluster and node pool configuration", () => {
@@ -185,13 +164,7 @@ describe("Resource Creation Tests", () => {
         expect(nodePool?.inputs.serviceName).toBe("mock-service-id");
     });
 
-    test("service account and Kubernetes resources", () => {
-        // Test service account
-        const user = resources.find(r => r.type === "ovh:CloudProject/user:User");
-        expect(user).toBeDefined();
-        expect(user?.inputs.serviceName).toBe("mock-service-id");
-        expect(user?.inputs.description).toBe("TrustGraph AI service account");
-        
+    test("Kubernetes resources", () => {
         // Test K8s provider
         const k8sProvider = resources.find(r => r.type === "pulumi:providers:kubernetes");
         expect(k8sProvider).toBeDefined();
@@ -199,11 +172,15 @@ describe("Resource Creation Tests", () => {
         
         // Test secrets
         const secrets = resources.filter(r => r.type === "kubernetes:core/v1:Secret");
-        expect(secrets.length).toBeGreaterThanOrEqual(2);
+        expect(secrets.length).toBeGreaterThanOrEqual(3); // gateway-secret, mcp-server-secret, openai-credentials
         
         const gatewaySecret = secrets.find(s => s.inputs.metadata?.name === "gateway-secret");
         expect(gatewaySecret).toBeDefined();
         expect(gatewaySecret?.inputs.metadata.namespace).toBe("trustgraph");
+        
+        const mcpServerSecret = secrets.find(s => s.inputs.metadata?.name === "mcp-server-secret");
+        expect(mcpServerSecret).toBeDefined();
+        expect(mcpServerSecret?.inputs.metadata.namespace).toBe("trustgraph");
         
         const aiSecret = secrets.find(s => s.inputs.metadata?.name === "openai-credentials");
         expect(aiSecret).toBeDefined();
