@@ -14,34 +14,6 @@ const provider = new ovh.Provider(
     }
 );
 
-// Create a private network for the cluster
-const privateNetwork = new ovh.cloudproject.NetworkPrivate(
-    "private-network",
-    {
-        serviceName: serviceName,
-        name: prefix + "-network",
-        regions: [region],
-        vlanId: 0,
-    },
-    { provider: provider }
-);
-
-// Create a subnet for the private network
-const subnet = new ovh.cloudproject.NetworkPrivateSubnet(
-    "subnet",
-    {
-        serviceName: serviceName,
-        networkId: privateNetwork.id,
-        region: region,
-        start: "10.0.0.100",
-        end: "10.0.0.200",
-        network: "10.0.0.0/24",
-        dhcp: true,
-        noGateway: false,
-    },
-    { provider: provider }
-);
-
 // Create a K8s cluster
 // Note: Starting without private network configuration to simplify deployment
 // You can add private network configuration later if needed
@@ -89,16 +61,6 @@ const k8sProvider = new k8s.Provider(
     {
         kubeconfig: kubeconfig,
     }
-);
-
-// Create a service account for AI access
-const serviceAccount = new ovh.cloudproject.User(
-    "ai-user",
-    {
-        serviceName: serviceName,
-        description: "TrustGraph AI service account",
-    },
-    { provider: provider, dependsOn: [ nodePool ] }
 );
 
 /*
@@ -168,6 +130,21 @@ const gatewaySecret = new k8s.core.v1.Secret(
     { provider: k8sProvider, dependsOn: appDeploy }
 );
 
+// Generate an (empty) gateway secret - no authentication
+const mcpServerSecret = new k8s.core.v1.Secret(
+    "mcp-server-secret",
+    {
+        metadata: {
+            name: "mcp-server-secret",
+            namespace: "trustgraph"
+        },
+        stringData: {
+            "mcp-server-secret": ""
+        },
+    },
+    { provider: k8sProvider, dependsOn: appDeploy }
+);
+
 // Generate an AI endpoint secret - URL plus bearer token
 // OVHcloud AI Endpoints uses OpenAI-compatible API with bearer token authentication
 const endpointSecret = new k8s.core.v1.Secret(
@@ -197,5 +174,4 @@ export const clusterEndpoint = cluster.kubeconfig.apply(k => {
     }
 });
 export const aiUrl = aiEndpointUrl;
-export const networkId = privateNetwork.id;
 
