@@ -6,6 +6,6 @@ config:
   trustgraph-ovhcloud:ai-model: Mistral-Nemo-Instruct-2407
   trustgraph-ovhcloud:ai-endpoint: mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net
   trustgraph-ovhcloud:node-size: b2-15
-  trustgraph-ovhcloud:node-count: "2"
+  trustgraph-ovhcloud:node-count: "3"
   trustgraph-ovhcloud:ai-endpoints-token:
     secure: v1:cVwSu8UOZ9dyqWM+:MsWrAHXtPsONiop178ZWntXqFsiB1l5tcDLLa3k9w5mcmQ4d1I5nH+wlcQ==
