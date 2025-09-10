@@ -56,7 +56,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: agent-manager
           resources:
             limits:
@@ -115,7 +115,7 @@ items:
               secretKeyRef:
                 key: gateway-secret
                 name: gateway-secret
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: api-gateway
           ports:
           - containerPort: 8088
@@ -241,7 +241,7 @@ items:
           - '100'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: chunker
           resources:
             limits:
@@ -290,7 +290,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: config-svc
           resources:
             limits:
@@ -319,6 +319,52 @@ items:
   kind: Deployment
   metadata:
     labels:
+      app: ddg-mcp-server
+    name: ddg-mcp-server
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: ddg-mcp-server
+    template:
+      metadata:
+        labels:
+          app: ddg-mcp-server
+      spec:
+        containers:
+        - image: docker.io/trustgraph/ddg-mcp-server:0.1.0
+          name: ddg-mcp-server
+          ports:
+          - containerPort: 9870
+            hostPort: 9870
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 256M
+            requests:
+              cpu: '0.1'
+              memory: 256M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ddg-mcp-server
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: mcp
+      port: 9870
+      targetPort: 9870
+    selector:
+      app: ddg-mcp-server
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
       app: document-embeddings
     name: document-embeddings
     namespace: trustgraph
@@ -339,7 +385,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: document-embeddings
           resources:
             limits:
@@ -390,7 +436,7 @@ items:
           - '20'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: document-rag
           resources:
             limits:
@@ -443,7 +489,7 @@ items:
           - sentence-transformers/all-MiniLM-L6-v2
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: embeddings
           resources:
             limits:
@@ -1025,7 +1071,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: graph-embeddings
           resources:
             limits:
@@ -1082,7 +1128,7 @@ items:
           - '2'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: graph-rag
           resources:
             limits:
@@ -1199,6 +1245,8 @@ items:
       "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{class}",
       "prompt-response": "non-persistent://tg/response/prompt:{class}", "request":
       "non-persistent://tg/request/agent:{id}", "response": "non-persistent://tg/response/agent:{id}",
+      "structured-query-request": "non-persistent://tg/request/structured-query:{class}",
+      "structured-query-response": "non-persistent://tg/response/structured-query:{class}",
       "text-completion-request": "non-persistent://tg/request/text-completion:{class}",
       "text-completion-response": "non-persistent://tg/response/text-completion:{class}"},
       "chunker:{id}": {"input": "persistent://tg/flow/text-document-load:{id}", "output":
@@ -1283,6 +1331,8 @@ items:
       "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{class}",
       "prompt-response": "non-persistent://tg/response/prompt:{class}", "request":
       "non-persistent://tg/request/agent:{id}", "response": "non-persistent://tg/response/agent:{id}",
+      "structured-query-request": "non-persistent://tg/request/structured-query:{class}",
+      "structured-query-response": "non-persistent://tg/response/structured-query:{class}",
       "text-completion-request": "non-persistent://tg/request/text-completion:{class}",
       "text-completion-response": "non-persistent://tg/response/text-completion:{class}"},
       "chunker:{id}": {"input": "persistent://tg/flow/text-document-load:{id}", "output":
@@ -1360,7 +1410,9 @@ items:
       "non-persistent://tg/response/mcp-tool:{class}", "next": "non-persistent://tg/request/agent:{id}",
       "prompt-request": "non-persistent://tg/request/prompt:{class}", "prompt-response":
       "non-persistent://tg/response/prompt:{class}", "request": "non-persistent://tg/request/agent:{id}",
-      "response": "non-persistent://tg/response/agent:{id}", "text-completion-request":
+      "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
+      "non-persistent://tg/request/structured-query:{class}", "structured-query-response":
+      "non-persistent://tg/response/structured-query:{class}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{class}", "text-completion-response":
       "non-persistent://tg/response/text-completion:{class}"}, "chunker:{id}": {"input":
       "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
@@ -1385,8 +1437,8 @@ items:
       "non-persistent://tg/response/graph-embeddings:{class}"}, "graph-embeddings-store":
       "persistent://tg/flow/graph-embeddings-store:{id}", "graph-rag": {"request":
       "non-persistent://tg/request/graph-rag:{class}", "response": "non-persistent://tg/response/graph-rag:{class}"},
-      "mcp-tool": {"request": "non-persistent://tg/request/mtp-tool:{class}", "response":
-      "non-persistent://tg/response/mtp-tool:{class}"}, "prompt": {"request": "non-persistent://tg/request/prompt:{class}",
+      "mcp-tool": {"request": "non-persistent://tg/request/mcp-tool:{class}", "response":
+      "non-persistent://tg/response/mcp-tool:{class}"}, "prompt": {"request": "non-persistent://tg/request/prompt:{class}",
       "response": "non-persistent://tg/response/prompt:{class}"}, "text-completion":
       {"request": "non-persistent://tg/request/text-completion:{class}", "response":
       "non-persistent://tg/response/text-completion:{class}"}, "text-load": "persistent://tg/flow/text-document-load:{id}",
@@ -1428,7 +1480,9 @@ items:
       "non-persistent://tg/response/mcp-tool:{class}", "next": "non-persistent://tg/request/agent:{id}",
       "prompt-request": "non-persistent://tg/request/prompt:{class}", "prompt-response":
       "non-persistent://tg/response/prompt:{class}", "request": "non-persistent://tg/request/agent:{id}",
-      "response": "non-persistent://tg/response/agent:{id}", "text-completion-request":
+      "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
+      "non-persistent://tg/request/structured-query:{class}", "structured-query-response":
+      "non-persistent://tg/response/structured-query:{class}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{class}", "text-completion-response":
       "non-persistent://tg/response/text-completion:{class}"}, "chunker:{id}": {"input":
       "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
@@ -1450,18 +1504,159 @@ items:
       "non-persistent://tg/request/graph-embeddings:{class}", "response": "non-persistent://tg/response/graph-embeddings:{class}"},
       "graph-embeddings-store": "persistent://tg/flow/graph-embeddings-store:{id}",
       "graph-rag": {"request": "non-persistent://tg/request/graph-rag:{class}", "response":
-      "non-persistent://tg/response/graph-rag:{class}"}, "mcp-tool": {"request": "non-persistent://tg/request/mtp-tool:{class}",
-      "response": "non-persistent://tg/response/mtp-tool:{class}"}, "prompt": {"request":
+      "non-persistent://tg/response/graph-rag:{class}"}, "mcp-tool": {"request": "non-persistent://tg/request/mcp-tool:{class}",
+      "response": "non-persistent://tg/response/mcp-tool:{class}"}, "prompt": {"request":
       "non-persistent://tg/request/prompt:{class}", "response": "non-persistent://tg/response/prompt:{class}"},
       "text-completion": {"request": "non-persistent://tg/request/text-completion:{class}",
       "response": "non-persistent://tg/response/text-completion:{class}"}, "text-load":
       "persistent://tg/flow/text-document-load:{id}", "triples": {"request": "non-persistent://tg/request/triples:{class}",
       "response": "non-persistent://tg/response/triples:{class}"}, "triples-store":
       "persistent://tg/flow/triples-store:{id}"}, "tags": ["graph-rag", "knowledge-extraction",
-      "agent-extract"]}}, "flows": {"default": {"class-name": "document-rag+graph-rag",
-      "description": "Default processing flow", "interfaces": {"agent": {"request":
-      "non-persistent://tg/request/agent:default", "response": "non-persistent://tg/response/agent:default"},
-      "document-embeddings": {"request": "non-persistent://tg/request/document-embeddings:document-rag+graph-rag",
+      "agent-extract"]}, "graph-rag+object-extract": {"class": {"embeddings:{class}":
+      {"request": "non-persistent://tg/request/embeddings:{class}", "response": "non-persistent://tg/response/embeddings:{class}"},
+      "ge-query:{class}": {"request": "non-persistent://tg/request/graph-embeddings:{class}",
+      "response": "non-persistent://tg/response/graph-embeddings:{class}"}, "graph-rag:{class}":
+      {"embeddings-request": "non-persistent://tg/request/embeddings:{class}", "embeddings-response":
+      "non-persistent://tg/response/embeddings:{class}", "graph-embeddings-request":
+      "non-persistent://tg/request/graph-embeddings:{class}", "graph-embeddings-response":
+      "non-persistent://tg/response/graph-embeddings:{class}", "prompt-request": "non-persistent://tg/request/prompt-rag:{class}",
+      "prompt-response": "non-persistent://tg/response/prompt-rag:{class}", "request":
+      "non-persistent://tg/request/graph-rag:{class}", "response": "non-persistent://tg/response/graph-rag:{class}",
+      "triples-request": "non-persistent://tg/request/triples:{class}", "triples-response":
+      "non-persistent://tg/response/triples:{class}"}, "mcp-tool:{class}": {"request":
+      "non-persistent://tg/request/mcp-tool:{class}", "response": "non-persistent://tg/response/mcp-tool:{class}",
+      "text-completion-request": "non-persistent://tg/request/text-completion:{class}",
+      "text-completion-response": "non-persistent://tg/response/text-completion:{class}"},
+      "metering-rag:{class}": {"input": "non-persistent://tg/response/text-completion-rag:{class}"},
+      "metering:{class}": {"input": "non-persistent://tg/response/text-completion:{class}"},
+      "nlp-query:{class}": {"prompt-request": "non-persistent://tg/request/prompt-rag:{class}",
+      "prompt-response": "non-persistent://tg/response/prompt-rag:{class}", "request":
+      "non-persistent://tg/request/nlp-query:{class}", "response": "non-persistent://tg/response/nlp-query:{class}"},
+      "objects-query:{class}": {"request": "non-persistent://tg/request/objects:{class}",
+      "response": "non-persistent://tg/response/objects:{class}"}, "prompt-rag:{class}":
+      {"request": "non-persistent://tg/request/prompt-rag:{class}", "response": "non-persistent://tg/response/prompt-rag:{class}",
+      "text-completion-request": "non-persistent://tg/request/text-completion-rag:{class}",
+      "text-completion-response": "non-persistent://tg/response/text-completion-rag:{class}"},
+      "prompt:{class}": {"request": "non-persistent://tg/request/prompt:{class}",
+      "response": "non-persistent://tg/response/prompt:{class}", "text-completion-request":
+      "non-persistent://tg/request/text-completion:{class}", "text-completion-response":
+      "non-persistent://tg/response/text-completion:{class}"}, "structured-query:{class}":
+      {"nlp-query-request": "non-persistent://tg/request/nlp-query:{class}", "nlp-query-response":
+      "non-persistent://tg/response/nlp-query:{class}", "objects-query-request": "non-persistent://tg/request/objects:{class}",
+      "objects-query-response": "non-persistent://tg/response/objects:{class}", "request":
+      "non-persistent://tg/request/structured-query:{class}", "response": "non-persistent://tg/response/structured-query:{class}"},
+      "text-completion-rag:{class}": {"request": "non-persistent://tg/request/text-completion-rag:{class}",
+      "response": "non-persistent://tg/response/text-completion-rag:{class}"}, "text-completion:{class}":
+      {"request": "non-persistent://tg/request/text-completion:{class}", "response":
+      "non-persistent://tg/response/text-completion:{class}"}, "triples-query:{class}":
+      {"request": "non-persistent://tg/request/triples:{class}", "response": "non-persistent://tg/response/triples:{class}"}},
+      "description": "GraphRAG + object extract", "flow": {"agent-manager:{id}": {"graph-rag-request":
+      "non-persistent://tg/request/graph-rag:{class}", "graph-rag-response": "non-persistent://tg/response/graph-rag:{class}",
+      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{class}", "mcp-tool-response":
+      "non-persistent://tg/response/mcp-tool:{class}", "next": "non-persistent://tg/request/agent:{id}",
+      "prompt-request": "non-persistent://tg/request/prompt:{class}", "prompt-response":
+      "non-persistent://tg/response/prompt:{class}", "request": "non-persistent://tg/request/agent:{id}",
+      "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
+      "non-persistent://tg/request/structured-query:{class}", "structured-query-response":
+      "non-persistent://tg/response/structured-query:{class}", "text-completion-request":
+      "non-persistent://tg/request/text-completion:{class}", "text-completion-response":
+      "non-persistent://tg/response/text-completion:{class}"}, "chunker:{id}": {"input":
+      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
+      "ge-write:{id}": {"input": "persistent://tg/flow/graph-embeddings-store:{id}"},
+      "graph-embeddings:{id}": {"embeddings-request": "non-persistent://tg/request/embeddings:{class}",
+      "embeddings-response": "non-persistent://tg/response/embeddings:{class}", "input":
+      "persistent://tg/flow/entity-contexts-load:{id}", "output": "persistent://tg/flow/graph-embeddings-store:{id}"},
+      "kg-extract-objects:{id}": {"entity-contexts": "persistent://tg/flow/entity-contexts-load:{id}",
+      "input": "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/objects-store:{id}",
+      "prompt-request": "non-persistent://tg/request/prompt:{class}", "prompt-response":
+      "non-persistent://tg/response/prompt:{class}"}, "objects-write:{id}": {"input":
+      "persistent://tg/flow/objects-store:{id}"}, "pdf-decoder:{id}": {"input": "persistent://tg/flow/document-load:{id}",
+      "output": "persistent://tg/flow/text-document-load:{id}"}, "triples-write:{id}":
+      {"input": "persistent://tg/flow/triples-store:{id}"}}, "interfaces": {"agent":
+      {"request": "non-persistent://tg/request/agent:{id}", "response": "non-persistent://tg/response/agent:{id}"},
+      "document-load": "persistent://tg/flow/document-load:{id}", "embeddings": {"request":
+      "non-persistent://tg/request/embeddings:{class}", "response": "non-persistent://tg/response/embeddings:{class}"},
+      "entity-contexts-load": "persistent://tg/flow/entity-contexts-load:{id}", "graph-embeddings":
+      {"request": "non-persistent://tg/request/graph-embeddings:{class}", "response":
+      "non-persistent://tg/response/graph-embeddings:{class}"}, "graph-embeddings-store":
+      "persistent://tg/flow/graph-embeddings-store:{id}", "graph-rag": {"request":
+      "non-persistent://tg/request/graph-rag:{class}", "response": "non-persistent://tg/response/graph-rag:{class}"},
+      "mcp-tool": {"request": "non-persistent://tg/request/mcp-tool:{class}", "response":
+      "non-persistent://tg/response/mcp-tool:{class}"}, "nlp-query": {"request": "non-persistent://tg/request/nlp-query:{class}",
+      "response": "non-persistent://tg/response/nlp-query:{class}"}, "objects": {"request":
+      "non-persistent://tg/request/objects:{class}", "response": "non-persistent://tg/response/objects:{class}"},
+      "objects-store": "persistent://tg/flow/objects-store:{id}", "prompt": {"request":
+      "non-persistent://tg/request/prompt:{class}", "response": "non-persistent://tg/response/prompt:{class}"},
+      "structured-query": {"request": "non-persistent://tg/request/structured-query:{class}",
+      "response": "non-persistent://tg/response/structured-query:{class}"}, "text-completion":
+      {"request": "non-persistent://tg/request/text-completion:{class}", "response":
+      "non-persistent://tg/response/text-completion:{class}"}, "text-load": "persistent://tg/flow/text-document-load:{id}",
+      "triples": {"request": "non-persistent://tg/request/triples:{class}", "response":
+      "non-persistent://tg/response/triples:{class}"}, "triples-store": "persistent://tg/flow/triples-store:{id}"},
+      "tags": ["graph-rag", "knowledge-extraction", "object-extract"]}, "object-extraction":
+      {"class": {"embeddings:{class}": {"request": "non-persistent://tg/request/embeddings:{class}",
+      "response": "non-persistent://tg/response/embeddings:{class}"}, "mcp-tool:{class}":
+      {"request": "non-persistent://tg/request/mcp-tool:{class}", "response": "non-persistent://tg/response/mcp-tool:{class}",
+      "text-completion-request": "non-persistent://tg/request/text-completion:{class}",
+      "text-completion-response": "non-persistent://tg/response/text-completion:{class}"},
+      "metering-rag:{class}": {"input": "non-persistent://tg/response/text-completion-rag:{class}"},
+      "metering:{class}": {"input": "non-persistent://tg/response/text-completion:{class}"},
+      "nlp-query:{class}": {"prompt-request": "non-persistent://tg/request/prompt-rag:{class}",
+      "prompt-response": "non-persistent://tg/response/prompt-rag:{class}", "request":
+      "non-persistent://tg/request/nlp-query:{class}", "response": "non-persistent://tg/response/nlp-query:{class}"},
+      "objects-query:{class}": {"request": "non-persistent://tg/request/objects:{class}",
+      "response": "non-persistent://tg/response/objects:{class}"}, "prompt-rag:{class}":
+      {"request": "non-persistent://tg/request/prompt-rag:{class}", "response": "non-persistent://tg/response/prompt-rag:{class}",
+      "text-completion-request": "non-persistent://tg/request/text-completion-rag:{class}",
+      "text-completion-response": "non-persistent://tg/response/text-completion-rag:{class}"},
+      "prompt:{class}": {"request": "non-persistent://tg/request/prompt:{class}",
+      "response": "non-persistent://tg/response/prompt:{class}", "text-completion-request":
+      "non-persistent://tg/request/text-completion:{class}", "text-completion-response":
+      "non-persistent://tg/response/text-completion:{class}"}, "structured-query:{class}":
+      {"nlp-query-request": "non-persistent://tg/request/nlp-query:{class}", "nlp-query-response":
+      "non-persistent://tg/response/nlp-query:{class}", "objects-query-request": "non-persistent://tg/request/objects:{class}",
+      "objects-query-response": "non-persistent://tg/response/objects:{class}", "request":
+      "non-persistent://tg/request/structured-query:{class}", "response": "non-persistent://tg/response/structured-query:{class}"},
+      "text-completion-rag:{class}": {"request": "non-persistent://tg/request/text-completion-rag:{class}",
+      "response": "non-persistent://tg/response/text-completion-rag:{class}"}, "text-completion:{class}":
+      {"request": "non-persistent://tg/request/text-completion:{class}", "response":
+      "non-persistent://tg/response/text-completion:{class}"}}, "description": "Object
+      extraction only", "flow": {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{class}",
+      "graph-rag-response": "non-persistent://tg/response/graph-rag:{class}", "mcp-tool-request":
+      "non-persistent://tg/request/mcp-tool:{class}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{class}",
+      "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{class}",
+      "prompt-response": "non-persistent://tg/response/prompt:{class}", "request":
+      "non-persistent://tg/request/agent:{id}", "response": "non-persistent://tg/response/agent:{id}",
+      "structured-query-request": "non-persistent://tg/request/structured-query:{class}",
+      "structured-query-response": "non-persistent://tg/response/structured-query:{class}",
+      "text-completion-request": "non-persistent://tg/request/text-completion:{class}",
+      "text-completion-response": "non-persistent://tg/response/text-completion:{class}"},
+      "chunker:{id}": {"input": "persistent://tg/flow/text-document-load:{id}", "output":
+      "persistent://tg/flow/chunk-load:{id}"}, "kg-extract-objects:{id}": {"entity-contexts":
+      "persistent://tg/flow/entity-contexts-load:{id}", "input": "persistent://tg/flow/chunk-load:{id}",
+      "output": "persistent://tg/flow/objects-store:{id}", "prompt-request": "non-persistent://tg/request/prompt:{class}",
+      "prompt-response": "non-persistent://tg/response/prompt:{class}"}, "objects-write:{id}":
+      {"input": "persistent://tg/flow/objects-store:{id}"}, "pdf-decoder:{id}": {"input":
+      "persistent://tg/flow/document-load:{id}", "output": "persistent://tg/flow/text-document-load:{id}"}},
+      "interfaces": {"agent": {"request": "non-persistent://tg/request/agent:{id}",
+      "response": "non-persistent://tg/response/agent:{id}"}, "document-load": "persistent://tg/flow/document-load:{id}",
+      "embeddings": {"request": "non-persistent://tg/request/embeddings:{class}",
+      "response": "non-persistent://tg/response/embeddings:{class}"}, "mcp-tool":
+      {"request": "non-persistent://tg/request/mcp-tool:{class}", "response": "non-persistent://tg/response/mcp-tool:{class}"},
+      "nlp-query": {"request": "non-persistent://tg/request/nlp-query:{class}", "response":
+      "non-persistent://tg/response/nlp-query:{class}"}, "objects": {"request": "non-persistent://tg/request/objects:{class}",
+      "response": "non-persistent://tg/response/objects:{class}"}, "objects-store":
+      "persistent://tg/flow/objects-store:{id}", "prompt": {"request": "non-persistent://tg/request/prompt:{class}",
+      "response": "non-persistent://tg/response/prompt:{class}"}, "structured-query":
+      {"request": "non-persistent://tg/request/structured-query:{class}", "response":
+      "non-persistent://tg/response/structured-query:{class}"}, "text-completion":
+      {"request": "non-persistent://tg/request/text-completion:{class}", "response":
+      "non-persistent://tg/response/text-completion:{class}"}, "text-load": "persistent://tg/flow/text-document-load:{id}"},
+      "tags": ["knowledge-extraction", "object-extraction"]}}, "flows": {"default":
+      {"class-name": "document-rag+graph-rag", "description": "Default processing
+      flow", "interfaces": {"agent": {"request": "non-persistent://tg/request/agent:default",
+      "response": "non-persistent://tg/response/agent:default"}, "document-embeddings":
+      {"request": "non-persistent://tg/request/document-embeddings:document-rag+graph-rag",
       "response": "non-persistent://tg/response/document-embeddings:document-rag+graph-rag"},
       "document-embeddings-store": "persistent://tg/flow/document-embeddings-store:default",
       "document-load": "persistent://tg/flow/document-load:default", "document-rag":
@@ -1491,6 +1686,8 @@ items:
       "next": "non-persistent://tg/request/agent:default", "prompt-request": "non-persistent://tg/request/prompt:document-rag+graph-rag",
       "prompt-response": "non-persistent://tg/response/prompt:document-rag+graph-rag",
       "request": "non-persistent://tg/request/agent:default", "response": "non-persistent://tg/response/agent:default",
+      "structured-query-request": "non-persistent://tg/request/structured-query:document-rag+graph-rag",
+      "structured-query-response": "non-persistent://tg/response/structured-query:document-rag+graph-rag",
       "text-completion-request": "non-persistent://tg/request/text-completion:document-rag+graph-rag",
       "text-completion-response": "non-persistent://tg/response/text-completion:document-rag+graph-rag"}},
       "chunker": {"default": {"input": "persistent://tg/flow/text-document-load:default",
@@ -1566,23 +1763,29 @@ items:
       "Entity contexts loader", "kind": "send"}, "graph-embeddings": {"description":
       "Graph embeddings service", "kind": "request-response"}, "graph-embeddings-store":
       {"description": "Graph embeddings loader", "kind": "send"}, "graph-rag": {"description":
-      "GraphRAG service", "kind": "request-response"}, "prompt": {"description": "Prompt
-      service", "kind": "request-response"}, "text-completion": {"description": "Text
-      completion service", "kind": "request-response"}, "text-load": {"description":
+      "GraphRAG service", "kind": "request-response"}, "nlp-query": {"description":
+      "NLP question to GraphQL service", "kind": "request-response"}, "objects": {"description":
+      "Object query service", "kind": "request-response"}, "objects-store": {"description":
+      "Object store", "kind": "request-response"}, "prompt": {"description": "Prompt
+      service", "kind": "request-response"}, "structured-query": {"description": "Structured
+      query service", "kind": "request-response"}, "text-completion": {"description":
+      "Text completion service", "kind": "request-response"}, "text-load": {"description":
       "Text document loader", "kind": "send", "visible": true}, "triples": {"description":
       "Triples query service", "kind": "request-response"}, "triples-store": {"description":
-      "Triples loader", "kind": "send"}}, "mcp": [], "prompt": {"system": "You are
-      a helpful assistant.", "template-index": ["agent-kg-extract", "agent-react",
+      "Triples loader", "kind": "send"}}, "mcp": {"duckduckgo": {"remote-name": "search",
+      "url": "http://ddg-mcp-server:9870/mcp"}}, "prompt": {"system": "You are a helpful
+      assistant.", "template-index": ["agent-kg-extract", "agent-react", "diagnose-structured-data",
       "document-prompt", "extract-definitions", "extract-relationships", "extract-rows",
-      "extract-topics", "kg-prompt", "question"], "template.agent-kg-extract": {"prompt":
-      "Analyze the following text and extract both entity definitions and relationships.
-      Return the results as JSON with ''definitions'' and ''relationships'' arrays.\n\nFor
-      definitions, extract entities and their explanations or descriptions.\nFor relationships,
-      extract subject-predicate-object triples where subjects and objects are entities,
-      and predicates are relationship types.\n\nText: {{text}}\n\nReturn JSON only,
-      no other text. Use this exact format:\n{\n  \"definitions\": [\n    {\n      \"entity\":
-      \"entity_name\",\n      \"definition\": \"definition_text\"\n    }\n  ],\n  \"relationships\":
-      [\n    {\n      \"subject\": \"subject_entity\",\n      \"predicate\": \"relationship_type\",\n      \"object\":
+      "extract-topics", "graphql-generation", "kg-prompt", "question", "schema-selection"],
+      "template.agent-kg-extract": {"prompt": "Analyze the following text and extract
+      both entity definitions and relationships. Return the results as JSON with ''definitions''
+      and ''relationships'' arrays.\n\nFor definitions, extract entities and their
+      explanations or descriptions.\nFor relationships, extract subject-predicate-object
+      triples where subjects and objects are entities, and predicates are relationship
+      types.\n\nText: {{text}}\n\nReturn JSON only, no other text. Use this exact
+      format:\n{\n  \"definitions\": [\n    {\n      \"entity\": \"entity_name\",\n      \"definition\":
+      \"definition_text\"\n    }\n  ],\n  \"relationships\": [\n    {\n      \"subject\":
+      \"subject_entity\",\n      \"predicate\": \"relationship_type\",\n      \"object\":
       \"object_entity_or_literal\",\n      \"object-entity\": true\n    }\n  ]\n}\n",
       "response-type": "json", "schema": {"properties": {"definitions": {"items":
       {"properties": {"definition": {"type": "string"}, "entity": {"type": "string"}},
@@ -1642,14 +1845,135 @@ items:
       actions that gather the most relevant information for the task\n\n# Proceed\n\nQuestion:
       {{question}}\n    \n{% for h in history %}\nAction: \"{{h.action}}\"\nArgs:
       {\n{% for k, v in h.arguments.items() %}  \"{{k}}\": \"{{v}}\"\n{% endfor %}}\nObservation:
-      \"{{h.observation}}\"\n{% endfor %}\n", "response-type": "text"}, "template.document-prompt":
-      {"prompt": "Study the following context. Use only the information provided in
-      the context in your response. Do not speculate if the answer is not found in
-      the provided set of knowledge statements.\n\nHere is the context:\n{{documents}}\n\nUse
-      only the provided knowledge statements to respond to the following:\n{{query}}\n",
-      "response-type": "text"}, "template.extract-definitions": {"prompt": "<instructions>\nStudy
-      the following text and derive definitions for any discovered entities.\nDo not
-      provide definitions for entities whose definitions are incomplete\nor unknown.\nOutput
+      \"{{h.observation}}\"\n{% endfor %}\n", "response-type": "text"}, "template.diagnose-structured-data":
+      {"prompt": "\nYou are an expert data engineer specializing in creating Structured
+      Data Descriptor configurations for data import pipelines, with particular expertise
+      in XML processing and XPath expressions. Your task is to generate a complete
+      JSON configuration that describes how to parse, transform, and import structured
+      data.\n\n## Your Role\nGenerate a comprehensive Structured Data Descriptor configuration
+      based on the user''s requirements. The descriptor should be production-ready,
+      include appropriate error handling, and follow best practices for data quality
+      and transformation.\n\n## XML Processing Expertise\n\nWhen working with XML
+      data, you must:\n\n1. **Analyze XML Structure** - Examine the hierarchy, namespaces,
+      and element patterns\n2. **Generate Proper XPath Expressions** - Create efficient
+      XPath selectors for record extraction\n3. **Handle Complex XML Patterns** -
+      Support various XML formats including:\n   - Standard element structures: `<customer><name>John</name></customer>`\n   -
+      Attribute-based fields: `<field name=\"country\">USA</field>`\n   - Mixed content
+      and nested hierarchies\n   - Namespaced XML documents\n\n## XPath Expression
+      Guidelines\n\nFor XML format configurations, use these XPath patterns:\n\n**Record
+      Path Examples:**\n- Simple records: `//record` or `//customer`\n- Nested records:
+      `//data/records/record` or `//customers/customer`\n- Absolute paths: `/ROOT/data/record`
+      (will be converted to relative paths automatically)\n- With namespaces: `//ns:record`
+      or `//soap:Body/data/record`\n\n**Field Attribute Patterns:**\n- When fields
+      use name attributes: set `field_attribute: \"name\"` for `<field name=\"key\">value</field>`\n-
+      For other attribute patterns: set appropriate attribute name\n\n**CRITICAL:
+      Source Field Names in Mappings**\n\nWhen using `field_attribute`, the XML parser
+      extracts field names from the attribute values and creates a flat dictionary.
+      Your source field names in mappings must match these extracted names:\n\n**CORRECT
+      Example:**\n```xml\n<field name=\"Country or Area\">Albania</field>\n<field
+      name=\"Trade (USD)\">1000.50</field>\n```\n\nBecomes parsed data:\n```json\n{\n  \"Country
+      or Area\": \"Albania\",\n  \"Trade (USD)\": \"1000.50\"\n}\n```\n\nSo your mappings
+      should use:\n```json\n{\n  \"source_field\": \"Country or Area\",     // \u2705
+      Correct - matches parsed field name\n  \"source_field\": \"Trade (USD)\"         //
+      \u2705 Correct - matches parsed field name\n}\n```\n\n**INCORRECT Example:**\n```json\n{\n  \"source_field\":
+      \"Field[@name=''Country or Area'']\",  // \u274c Wrong - XPath not needed here\n  \"source_field\":
+      \"field[@name=''Trade (USD)'']\"       // \u274c Wrong - XPath not needed here\n}\n```\n\n**XML
+      Format Configuration Template:**\n```json\n{\n  \"format\": {\n    \"type\":
+      \"xml\",\n    \"encoding\": \"utf-8\",\n    \"options\": {\n      \"record_path\":
+      \"//data/record\",        // XPath to find record elements\n      \"field_attribute\":
+      \"name\"              // For <field name=\"key\">value</field> pattern\n    }\n  }\n}\n```\n\n**Alternative
+      XML Options:**\n```json\n{\n  \"format\": {\n    \"type\": \"xml\", \n    \"encoding\":
+      \"utf-8\",\n    \"options\": {\n      \"record_path\": \"//customer\",           //
+      Direct element-based records\n      // No field_attribute needed for standard
+      XML\n    }\n  }\n}\n```\n\n## Required Information to Gather\n\nBefore generating
+      the descriptor, ask the user for these details if not provided:\n\n1. **Source
+      Data Format**\n   - File type (CSV, JSON, XML, Excel, fixed-width, etc.)\n   -
+      **For XML**: Sample structure, namespace prefixes, record element patterns\n   -
+      Sample data or field descriptions\n   - Any format-specific details (delimiters,
+      encoding, namespaces, etc.)\n\n2. **Target Schema**\n   - What fields should
+      be in the final output?\n   - What data types are expected?\n   - Any required
+      vs optional fields?\n\n3. **Data Transformations Needed**\n   - Field mappings
+      (source field \u2192 target field)\n   - Data cleaning requirements (trim spaces,
+      normalize case, etc.)\n   - Type conversions needed\n   - Any calculations or
+      derived fields\n   - Lookup tables or reference data needed\n\n4. **Data Quality
+      Requirements**\n   - Validation rules (format patterns, ranges, required fields)\n   -
+      How to handle missing or invalid data\n   - Duplicate handling strategy\n\n5.
+      **Processing Requirements**\n   - Any filtering needed (skip certain records)\n   -
+      Sorting requirements\n   - Aggregation or grouping needs\n   - Error handling
+      preferences\n\n## XML Structure Analysis\n\nWhen presented with XML data, analyze:\n\n1.
+      **Document Root**: What is the root element?\n2. **Record Container**: Where
+      are individual records located?\n3. **Field Pattern**: How are field names and
+      values structured?\n   - Direct child elements: `<name>John</name>`\n   - Attribute-based:
+      `<field name=\"name\">John</field>`\n   - Mixed patterns\n4. **Namespaces**:
+      Are there any namespace prefixes?\n5. **Hierarchy Depth**: How deeply nested
+      are the records?\n\n## Configuration Template Structure\n\nGenerate a JSON configuration
+      following this structure:\n\n```json\n{\n  \"version\": \"1.0\",\n  \"metadata\":
+      {\n    \"name\": \"[Descriptive name]\",\n    \"description\": \"[What this
+      config does]\",\n    \"author\": \"[Author or team]\",\n    \"created\": \"[ISO
+      date]\"\n  },\n  \"format\": {\n    \"type\": \"[csv|json|xml|fixed-width|excel]\",\n    \"encoding\":
+      \"utf-8\",\n    \"options\": {\n      // Format-specific parsing options\n      //
+      For XML: record_path (XPath), field_attribute (if applicable)\n    }\n  },\n  \"globals\":
+      {\n    \"variables\": {\n      // Global variables and constants\n    },\n    \"lookup_tables\":
+      {\n      // Reference data for transformations\n    }\n  },\n  \"preprocessing\":
+      [\n    // Global filters and operations before field mapping\n  ],\n  \"mappings\":
+      [\n    // Field mapping definitions with transforms and validation\n  ],\n  \"postprocessing\":
+      [\n    // Global operations after field mapping\n  ],\n  \"output\": {\n    \"format\":
+      \"trustgraph-objects\",\n    \"schema_name\": \"[target schema name]\",\n    \"options\":
+      {\n      \"confidence\": 0.85,\n      \"batch_size\": 1000\n    },\n    \"error_handling\":
+      {\n      \"on_validation_error\": \"log_and_skip\",\n      \"on_transform_error\":
+      \"log_and_skip\",\n      \"max_errors\": 100\n    }\n  }\n}\n```\n\n## Transform
+      Types Available\n\nUse these transform types in your mappings:\n\n**String Operations:**\n-
+      `trim`, `upper`, `lower`, `title_case`\n- `replace`, `regex_replace`, `substring`,
+      `pad_left`\n\n**Type Conversions:**\n- `to_string`, `to_int`, `to_float`, `to_bool`,
+      `to_date`\n\n**Data Operations:**\n- `default`, `lookup`, `concat`, `calculate`,
+      `conditional`\n\n**Validation Types:**\n- `required`, `not_null`, `min_length`,
+      `max_length`\n- `range`, `pattern`, `in_list`, `custom`\n\n## XML-Specific Best
+      Practices\n\n1. **Use efficient XPath expressions** - Prefer specific paths
+      over broad searches\n2. **Handle namespace prefixes** when present\n3. **Identify
+      field attribute patterns** correctly\n4. **Test XPath expressions** mentally
+      against the provided structure\n5. **Consider XML element vs attribute data**
+      in field mappings\n6. **Account for mixed content** and nested structures\n\n##
+      Best Practices to Follow\n\n1. **Always include error handling** with appropriate
+      policies\n2. **Use meaningful field names** that match target schema\n3. **Add
+      validation** for critical fields\n4. **Include default values** for optional
+      fields\n5. **Use lookup tables** for code translations\n6. **Add preprocessing
+      filters** to exclude invalid records\n7. **Include metadata** for documentation
+      and maintenance\n8. **Consider performance** with appropriate batch sizes\n\n##
+      Complete XML Example\n\nGiven this XML structure:\n```xml\n<ROOT>\n  <data>\n    <record>\n      <field
+      name=\"Country\">USA</field>\n      <field name=\"Year\">2024</field>\n      <field
+      name=\"Amount\">1000.50</field>\n    </record>\n  </data>\n</ROOT>\n```\n\nThe
+      parser will:\n1. Use `record_path: \"/ROOT/data/record\"` to find record elements\n2.
+      Use `field_attribute: \"name\"` to extract field names from the name attribute\n3.
+      Create this parsed data structure: `{\"Country\": \"USA\", \"Year\": \"2024\",
+      \"Amount\": \"1000.50\"}`\n\nGenerate this COMPLETE configuration:\n```json\n{\n  \"format\":
+      {\n    \"type\": \"xml\",\n    \"encoding\": \"utf-8\", \n    \"options\": {\n      \"record_path\":
+      \"/ROOT/data/record\",\n      \"field_attribute\": \"name\"\n    }\n  },\n  \"mappings\":
+      [\n    {\n      \"source_field\": \"Country\",          // \u2705 Matches parsed
+      field name\n      \"target_field\": \"country_name\"\n    },\n    {\n      \"source_field\":
+      \"Year\",             // \u2705 Matches parsed field name  \n      \"target_field\":
+      \"year\",\n      \"transforms\": [{\"type\": \"to_int\"}]\n    },\n    {\n      \"source_field\":
+      \"Amount\",           // \u2705 Matches parsed field name\n      \"target_field\":
+      \"amount\",\n      \"transforms\": [{\"type\": \"to_float\"}]\n    }\n  ]\n}\n```\n\n**KEY
+      RULE: source_field names must match the extracted field names, NOT the XML element
+      structure.**\n\n## Output Format\n\nProvide the configuration as ONLY a properly
+      formatted JSON document.\n\n## Schema\n\nThe following schema describes the
+      target result format:\n\n{% for schema in schemas %}\n**{{ schema.name }}**:
+      {{ schema.description }}\nFields:\n{% for field in schema.fields %}\n- {{ field.name
+      }} ({{ field.type }}){% if field.description %}: {{ field.description }}{% endif\n%}{%
+      if field.primary_key %} [PRIMARY KEY]{% endif %}{% if field.required %} [REQUIRED]{%
+      endif \n%}{% if field.indexed %} [INDEXED]{% endif %}{% if field.enum_values
+      %} [OPTIONS: {{\nfield.enum_values|join('', '') }}]{% endif %}\n{% endfor %}\n\n{%
+      endfor %}\n\n## Data sample\n\nAnalyze the XML structure and produce a Structured
+      Data Descriptor by diagnosing the following data sample. Pay special attention
+      to XML hierarchy, element patterns, and generate appropriate XPath expressions:\n\n{{sample}}\n",
+      "response-type": "json"}, "template.document-prompt": {"prompt": "Study the
+      following context. Use only the information provided in the context in your
+      response. Do not speculate if the answer is not found in the provided set of
+      knowledge statements.\n\nHere is the context:\n{{documents}}\n\nUse only the
+      provided knowledge statements to respond to the following:\n{{query}}\n", "response-type":
+      "text"}, "template.extract-definitions": {"prompt": "<instructions>\nStudy the
+      following text and derive definitions for any discovered entities.\nDo not provide
+      definitions for entities whose definitions are incomplete\nor unknown.\nOutput
       relationships in JSON format as an arary of objects with fields:\n- entity:
       the name of the entity\n- definition: English text which defines the entity\n</instructions>\n\n<text>\n{{text}}\n</text>\n\n<requirements>\nYou
       will respond only with raw JSON format data. Do not provide\nexplanations. Do
@@ -1690,26 +2014,82 @@ items:
       string, \"definition\": string}]\n```\n\n- Do not write any additional text
       or explanations.", "response-type": "json", "schema": {"items": {"properties":
       {"definition": {"type": "string"}, "topic": {"type": "string"}}, "required":
-      ["topic", "definition"], "type": "object"}, "type": "array"}}, "template.kg-prompt":
+      ["topic", "definition"], "type": "object"}, "type": "array"}}, "template.graphql-generation":
+      {"prompt": "You are a GraphQL query generation expert. Given a natural language
+      question and relevant database\n schemas, generate a precise GraphQL query to
+      answer the question.\n\n## Question:\n{{ question }}\n\n## Relevant Schemas:\n{%
+      for schema in schemas %}\n**{{ schema.name }}**: {{ schema.description }}\nFields:\n{%
+      for field in schema.fields %}\n- {{ field.name }} ({{ field.type }}){% if field.description
+      %}: {{ field.description }}{% endif\n%}{% if field.primary_key %} [PRIMARY KEY]{%
+      endif %}{% if field.required %} [REQUIRED]{% endif \n%}{% if field.indexed %}
+      [INDEXED]{% endif %}{% if field.enum_values %} [OPTIONS: {{\nfield.enum_values|join('',
+      '') }}]{% endif %}\n{% endfor %}\n\n{% endfor %}\n\n## GraphQL Query Rules:\n1.
+      Use the schema names as GraphQL query fields (e.g., `customers`, `orders`)\n2.
+      Apply filters using the `where` parameter with nested filter objects\n3. Available
+      filter operators per field type:\n   - String fields: `eq`, `contains`, `startsWith`,
+      `endsWith`, `in`, `not`, `not_in`\n   - Integer/Float fields: `eq`, `gt`, `gte`,
+      `lt`, `lte`, `in`, `not`, `not_in`\n4. Use `order_by` for sorting (field name
+      as string)\n5. Use `direction` for sort direction: `ASC` or `DESC`\n6. Use `limit`
+      to restrict number of results\n7. Select specific fields in the query body\n\n##
+      Example GraphQL Queries:\n\n**Question**: \"Show me customers from California\"\n```graphql\nquery
+      {\n  customers(where: {state: {eq: \"California\"}}, limit: 100) {\n    customer_id\n    name\n    email\n    state\n  }\n}\n\nQuestion:
+      \"Top 10 products by price\"\nquery {\n  products(order_by: \"price\", direction:
+      DESC, limit: 10) {\n    product_id\n    name\n    price\n    category\n  }\n}\n\nQuestion:
+      \"Recent orders over $100\"\nquery {\n  orders(\n    where: {\n      total_amount:
+      {gt: 100}\n      order_date: {gte: \"2024-01-01\"}\n    }\n    order_by: \"order_date\"\n    direction:
+      DESC\n    limit: 50\n  ) {\n    order_id\n    customer_id\n    total_amount\n    order_date\n    status\n  }\n}\n\nInstructions:\n\n1.
+      Analyze the question to identify:\n  - What data to retrieve (which fields to
+      select)\n  - What filters to apply (where conditions)\n  - What sorting is needed
+      (order_by, direction)\n  - How many results (limit)\n2. Generate a GraphQL query
+      that:\n  - Uses only the provided schema names and field names\n  - Applies
+      appropriate filters based on the question\n  - Selects relevant fields for the
+      response\n  - Includes reasonable limits (default 100 if not specified)\n3.
+      If variables are needed, include them in the response\n\nResponse Format:\n\nReturn
+      a JSON object with:\n- \"query\": the GraphQL query string\n- \"variables\":
+      object with any GraphQL variables (empty object if none)\n- \"confidence\":
+      float between 0.0-1.0 indicating confidence in the query\n\nExample:\n{\n  \"query\":
+      \"query { customers(where: {state: {eq: \\\"California\\\"}}, limit: 100) {
+      customer_id name\n email state } }\",\n  \"variables\": {},\n  \"confidence\":
+      0.95\n}\n\n", "response-type": "json", "schema": {"additionalProperties": false,
+      "properties": {"confidence": {"description": "Float between 0.0-1.0 indicating
+      confidence in the generated query", "maximum": 1, "minimum": 0, "type": "number"},
+      "query": {"description": "The GraphQL query string generated to answer the question",
+      "type": "string"}, "variables": {"additionalProperties": true, "description":
+      "Object containing any GraphQL variables needed for the query", "type": "object"}},
+      "required": ["query", "variables", "confidence"], "type": "object"}}, "template.kg-prompt":
       {"prompt": "Study the following set of knowledge statements. The statements
       are written in Cypher format that has been extracted from a knowledge graph.
       Use only the provided set of knowledge statements in your response. Do not speculate
       if the answer is not found in the provided set of knowledge statements.\n\nHere''s
       the knowledge statements:\n{% for edge in knowledge %}({{edge.s}})-[{{edge.p}}]->({{edge.o}})\n{%endfor%}\n\nUse
       only the provided knowledge statements to respond to the following:\n{{query}}\n",
-      "response-type": "text"}, "template.question": {"prompt": "{{question}}"}},
-      "token-costs": {"anthropic.claude-3-5-sonnet-20240620-v1:0": {"input_price":
-      3e-06, "model_name": "anthropic.claude-3-5-sonnet-20240620-v1:0", "output_price":
-      1.5e-05}, "anthropic.claude-3-haiku-20240307-v1:0": {"input_price": 2.5e-07,
-      "model_name": "anthropic.claude-3-haiku-20240307-v1:0", "output_price": 1.25e-06},
-      "c4ai-aya-23-8b": {"input_price": 0, "model_name": "c4ai-aya-23-8b", "output_price":
-      0}, "claude-3-5-sonnet-20240620": {"input_price": 3e-06, "model_name": "claude-3-5-sonnet-20240620",
-      "output_price": 1.5e-05}, "claude-3-haiku-20240307": {"input_price": 2.5e-07,
-      "model_name": "claude-3-haiku-20240307", "output_price": 1.25e-06}, "claude-3-opus-20240229":
-      {"input_price": 1.5e-05, "model_name": "claude-3-opus-20240229", "output_price":
-      7.5e-05}, "claude-3-sonnet-20240229": {"input_price": 3e-06, "model_name": "claude-3-sonnet-20240229",
-      "output_price": 1.5e-05}, "cohere.command-r-plus-v1:0": {"input_price": 3e-06,
-      "model_name": "cohere.command-r-plus-v1:0", "output_price": 1.5e-05}, "command-r-08-202":
+      "response-type": "text"}, "template.question": {"prompt": "{{question}}"}, "template.schema-selection":
+      {"prompt": "You are a database schema selection expert. Given a natural language
+      question and available\ndatabase schemas, your job is to identify which schemas
+      are most relevant to answer the question.\n\n## Available Schemas:\n{% for schema
+      in schemas %}\n**{{ schema.name }}**: {{ schema.description }}\nFields:\n{%
+      for field in schema.fields %}\n- {{ field.name }} ({{ field.type }}): {{ field.description
+      }}\n{% endfor %}\n\n{% endfor %}\n\n## Question:\n{{ question }}\n\n## Instructions:\n1.
+      Analyze the question to understand what data is being requested\n2. Examine
+      each schema to understand what data it contains\n3. Select ONLY the schemas
+      that are directly relevant to answering the question\n4. Return your answer
+      as a JSON array of schema names\n\n## Response Format:\nReturn ONLY a JSON array
+      of schema names, nothing else.\nExample: [\"customers\", \"orders\", \"products\"]\n",
+      "response-type": "json", "schema": {"description": "An array of schema names
+      that are relevant to answering the given question", "items": {"type": "string"},
+      "type": "array"}}}, "token-costs": {"anthropic.claude-3-5-sonnet-20240620-v1:0":
+      {"input_price": 3e-06, "model_name": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "output_price": 1.5e-05}, "anthropic.claude-3-haiku-20240307-v1:0": {"input_price":
+      2.5e-07, "model_name": "anthropic.claude-3-haiku-20240307-v1:0", "output_price":
+      1.25e-06}, "c4ai-aya-23-8b": {"input_price": 0, "model_name": "c4ai-aya-23-8b",
+      "output_price": 0}, "claude-3-5-sonnet-20240620": {"input_price": 3e-06, "model_name":
+      "claude-3-5-sonnet-20240620", "output_price": 1.5e-05}, "claude-3-haiku-20240307":
+      {"input_price": 2.5e-07, "model_name": "claude-3-haiku-20240307", "output_price":
+      1.25e-06}, "claude-3-opus-20240229": {"input_price": 1.5e-05, "model_name":
+      "claude-3-opus-20240229", "output_price": 7.5e-05}, "claude-3-sonnet-20240229":
+      {"input_price": 3e-06, "model_name": "claude-3-sonnet-20240229", "output_price":
+      1.5e-05}, "cohere.command-r-plus-v1:0": {"input_price": 3e-06, "model_name":
+      "cohere.command-r-plus-v1:0", "output_price": 1.5e-05}, "command-r-08-202":
       {"input_price": 2.5e-06, "model_name": "command-r-08-202", "output_price": 1e-05},
       "gpt-4o": {"input_price": 5e-06, "model_name": "gpt-4o", "output_price": 1.5e-05},
       "gpt-4o-2024-05-13": {"input_price": 5e-06, "model_name": "gpt-4o-2024-05-13",
@@ -1768,7 +2148,7 @@ items:
           - http://pulsar:8080
           - --config-file
           - /trustgraph/config.json
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: init-trustgraph
           resources:
             limits:
@@ -1813,7 +2193,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: kg-extract-agent
           resources:
             limits:
@@ -1864,7 +2244,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: kg-extract-definitions
           resources:
             limits:
@@ -1893,6 +2273,57 @@ items:
   kind: Deployment
   metadata:
     labels:
+      app: kg-extract-objects
+    name: kg-extract-objects
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: kg-extract-objects
+    template:
+      metadata:
+        labels:
+          app: kg-extract-objects
+      spec:
+        containers:
+        - command:
+          - kg-extract-objects
+          - -p
+          - pulsar://pulsar:6650
+          - --concurrency
+          - '1'
+          - --log-level
+          - DEBUG
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
+          name: kg-extract-objects
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 128M
+            requests:
+              cpu: '0.1'
+              memory: 128M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: kg-extract-objects
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: kg-extract-objects
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
       app: kg-extract-relationships
     name: kg-extract-relationships
     namespace: trustgraph
@@ -1915,7 +2346,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: kg-extract-relationships
           resources:
             limits:
@@ -1964,7 +2395,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: kg-manager
           resources:
             limits:
@@ -2013,7 +2444,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: kg-store
           resources:
             limits:
@@ -2062,7 +2493,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: librarian
           resources:
             limits:
@@ -2115,7 +2546,7 @@ items:
               secretKeyRef:
                 key: mcp-server-secret
                 name: mcp-server-secret
-          image: docker.io/trustgraph/trustgraph-mcp:1.2.10
+          image: docker.io/trustgraph/trustgraph-mcp:1.3.17
           name: mcp-server
           ports:
           - containerPort: 8000
@@ -2167,7 +2598,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: mcp-tool
           resources:
             limits:
@@ -2216,7 +2647,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: metering
           resources:
             limits:
@@ -2267,7 +2698,7 @@ items:
           - metering-rag
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: metering-rag
           resources:
             limits:
@@ -2343,10 +2774,10 @@ items:
           resources:
             limits:
               cpu: '0.5'
-              memory: 768M
+              memory: 512M
             requests:
               cpu: '0.25'
-              memory: 768M
+              memory: 512M
           securityContext:
             runAsGroup: 0
             runAsUser: 0
@@ -2376,6 +2807,55 @@ items:
   kind: Deployment
   metadata:
     labels:
+      app: nlp-query
+    name: nlp-query
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: nlp-query
+    template:
+      metadata:
+        labels:
+          app: nlp-query
+      spec:
+        containers:
+        - command:
+          - nlp-query
+          - -p
+          - pulsar://pulsar:6650
+          - --log-level
+          - DEBUG
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
+          name: nlp-query
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 128M
+            requests:
+              cpu: '0.1'
+              memory: 128M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: nlp-query
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: nlp-query
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
       app: pdf-decoder
     name: pdf-decoder
     namespace: trustgraph
@@ -2396,7 +2876,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: pdf-decoder
           resources:
             limits:
@@ -2429,41 +2909,63 @@ items:
       \ Alertmanager).\n  external_labels:\n    monitor: 'trustgraph'\n\n# A scrape\
       \ configuration containing exactly one endpoint to scrape:\n# Here it's Prometheus\
       \ itself.\nscrape_configs:\n\n  # The job name is added as a label `job=<job_name>`\
-      \ to any timeseries\n  # scraped from this config.\n\n  - job_name: 'pdf-decoder'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'pdf-decoder:8000'\n\
+      \ to any timeseries\n  # scraped from this config.\n\n  # TrustGraph services\n\
+      \n  - job_name: 'agent-manager'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'agent-manager:8000'\n\n  - job_name: 'api-gateway'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'api-gateway:8000'\n\
       \n  - job_name: 'chunker'\n    scrape_interval: 5s\n    static_configs:\n  \
-      \    - targets:\n        - 'chunker:8000'\n\n  - job_name: 'vectorize'\n   \
-      \ scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'vectorize:8000'\n\
+      \    - targets:\n        - 'chunker:8000'\n\n  - job_name: 'config-svc'\n  \
+      \  scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'config-svc:8000'\n\
+      \n  - job_name: 'document-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'document-embeddings:8000'\n\n  - job_name: 'document-rag'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'document-rag:8000'\n\
       \n  - job_name: 'embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'embeddings:8000'\n\n  - job_name: 'kg-extract-definitions'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-extract-definitions:8000'\n\
-      \n  - job_name: 'kg-extract-topics'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'kg-extract-topics:8000'\n\n  - job_name: 'kg-extract-relationships'\n\
+      \      - targets:\n        - 'embeddings:8000'\n\n  - job_name: 'graph-embeddings'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'graph-embeddings:8000'\n\
+      \n  - job_name: 'graph-rag'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'graph-rag:8000'\n\n  - job_name: 'kg-extract-agent'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-extract-agent:8000'\n\
+      \n  - job_name: 'kg-extract-definitions'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'kg-extract-definitions:8000'\n\n  - job_name:\
+      \ 'kg-extract-objects'\n    scrape_interval: 5s\n    static_configs:\n     \
+      \ - targets:\n        - 'kg-extract-objects:8000'\n\n  - job_name: 'kg-extract-relationships'\n\
       \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-extract-relationships:8000'\n\
-      \n  - job_name: 'metering'\n    scrape_interval: 5s\n    static_configs:\n \
-      \     - targets:\n        - 'metering:8000'\n\n  - job_name: 'metering-rag'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'metering-rag:8000'\n\
-      \n  - job_name: 'store-graph-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'store-graph-embeddings:8000'\n\n  - job_name:\
-      \ 'store-triples'\n    scrape_interval: 5s\n    static_configs:\n      - targets:\n\
-      \        - 'store-triples:8000'\n\n  - job_name: 'text-completion'\n    scrape_interval:\
-      \ 5s\n    static_configs:\n      - targets:\n        - 'text-completion:8000'\n\
-      \n  - job_name: 'text-completion-rag'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'text-completion-rag:8000'\n\n  - job_name: 'graph-rag'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'graph-rag:8000'\n\
-      \n  - job_name: 'prompt'\n    scrape_interval: 5s\n    static_configs:\n   \
-      \   - targets:\n        - 'prompt:8000'\n\n  - job_name: 'prompt-rag'\n    scrape_interval:\
-      \ 5s\n    static_configs:\n      - targets:\n        - 'prompt-rag:8000'\n\n\
-      \  - job_name: 'query-graph-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
+      \n  - job_name: 'kg-manager'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'kg-manager:8000'\n\n  - job_name: 'kg-store'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-store:8000'\n\
+      \n  - job_name: 'librarian'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'librarian:8000'\n\n  - job_name: 'mcp-server'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'mcp-server:8000'\n\
+      \n  - job_name: 'mcp-tool'\n    scrape_interval: 5s\n    static_configs:\n \
+      \     - targets:\n        - 'mcp-tool:8000'\n\n  - job_name: 'metering'\n  \
+      \  scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'metering:8000'\n\
+      \n  - job_name: 'metering-rag'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'metering-rag:8000'\n\n  - job_name: 'nlp-query'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'nlp-query:8000'\n\
+      \n  - job_name: 'pdf-decoder'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'pdf-decoder:8000'\n\n  - job_name: 'prompt'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'prompt:8000'\n\
+      \n  - job_name: 'prompt-rag'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'prompt-rag:8000'\n\n  - job_name: 'query-doc-embeddings'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'query-doc-embeddings:8000'\n\
+      \n  - job_name: 'query-graph-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
       \      - targets:\n        - 'query-graph-embeddings:8000'\n\n  - job_name:\
-      \ 'query-triples'\n    scrape_interval: 5s\n    static_configs:\n      - targets:\n\
-      \        - 'query-triples:8000'\n\n  - job_name: 'kg-store'\n    scrape_interval:\
-      \ 5s\n    static_configs:\n      - targets:\n        - 'kg-store:8000'\n\n \
-      \ - job_name: 'kg-manager'\n    scrape_interval: 5s\n    static_configs:\n \
-      \     - targets:\n        - 'kg-manager:8000'\n\n  - job_name: 'config-svc'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'config-svc:8000'\n\
-      \n  - job_name: 'pulsar'\n    scrape_interval: 5s\n    static_configs:\n   \
-      \   - targets:\n        - 'pulsar:8080'\n\n"
+      \ 'query-objects'\n    scrape_interval: 5s\n    static_configs:\n      - targets:\n\
+      \        - 'query-objects:8000'\n\n  - job_name: 'query-triples'\n    scrape_interval:\
+      \ 5s\n    static_configs:\n      - targets:\n        - 'query-triples:8000'\n\
+      \n  - job_name: 'store-doc-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'store-doc-embeddings:8000'\n\n  - job_name: 'store-graph-embeddings'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'store-graph-embeddings:8000'\n\
+      \n  - job_name: 'store-objects'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'store-objects:8000'\n\n  - job_name: 'store-triples'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'store-triples:8000'\n\
+      \n  - job_name: 'structured-query'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'structured-query:8000'\n\n  - job_name: 'text-completion'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'text-completion:8000'\n\
+      \n  - job_name: 'text-completion-rag'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'text-completion-rag:8000'\n\n  # Non-Trustgraph\
+      \ services\n  - job_name: 'pulsar'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'pulsar:8080'\n\n"
   kind: ConfigMap
   metadata:
     name: prometheus-cfg
@@ -2563,7 +3065,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: prompt
           resources:
             limits:
@@ -2584,8 +3086,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: prompt
 - apiVersion: apps/v1
@@ -2616,7 +3118,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: prompt-rag
           resources:
             limits:
@@ -2637,8 +3139,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: prompt-rag
 - apiVersion: v1
@@ -3015,7 +3517,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: query-doc-embeddings
           resources:
             limits:
@@ -3036,8 +3538,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: query-doc-embeddings
 - apiVersion: apps/v1
@@ -3066,7 +3568,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: query-graph-embeddings
           resources:
             limits:
@@ -3087,10 +3589,61 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: query-graph-embeddings
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: query-objects
+    name: query-objects
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: query-objects
+    template:
+      metadata:
+        labels:
+          app: query-objects
+      spec:
+        containers:
+        - command:
+          - objects-query-cassandra
+          - -p
+          - pulsar://pulsar:6650
+          - --cassandra-host
+          - cassandra
+          - --log-level
+          - DEBUG
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
+          name: query-objects
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 512M
+            requests:
+              cpu: '0.1'
+              memory: 512M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: query-objects
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: query-objects
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -3113,11 +3666,11 @@ items:
           - triples-query-cassandra
           - -p
           - pulsar://pulsar:6650
-          - -g
+          - --cassandra-host
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: query-triples
           resources:
             limits:
@@ -3138,8 +3691,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: query-triples
 - apiVersion: apps/v1
@@ -3168,7 +3721,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: store-doc-embeddings
           resources:
             limits:
@@ -3189,8 +3742,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: store-doc-embeddings
 - apiVersion: apps/v1
@@ -3219,7 +3772,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: store-graph-embeddings
           resources:
             limits:
@@ -3240,10 +3793,61 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: store-graph-embeddings
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: store-objects
+    name: store-objects
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: store-objects
+    template:
+      metadata:
+        labels:
+          app: store-objects
+      spec:
+        containers:
+        - command:
+          - objects-write-cassandra
+          - -p
+          - pulsar://pulsar:6650
+          - --cassandra-host
+          - cassandra
+          - --log-level
+          - DEBUG
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
+          name: store-objects
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 128M
+            requests:
+              cpu: '0.1'
+              memory: 128M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: store-objects
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: store-objects
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -3266,11 +3870,11 @@ items:
           - triples-write-cassandra
           - -p
           - pulsar://pulsar:6650
-          - -g
+          - --cassandra-host
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: store-triples
           resources:
             limits:
@@ -3291,10 +3895,59 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: store-triples
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: structured-query
+    name: structured-query
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: structured-query
+    template:
+      metadata:
+        labels:
+          app: structured-query
+      spec:
+        containers:
+        - command:
+          - structured-query
+          - -p
+          - pulsar://pulsar:6650
+          - --log-level
+          - DEBUG
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
+          name: structured-query
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 128M
+            requests:
+              cpu: '0.1'
+              memory: 128M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: structured-query
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: structured-query
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -3336,7 +3989,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: text-completion
           resources:
             limits:
@@ -3357,8 +4010,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: text-completion
 - apiVersion: apps/v1
@@ -3404,7 +4057,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:1.2.10
+          image: docker.io/trustgraph/trustgraph-flow:1.3.17
           name: text-completion-rag
           resources:
             limits:
@@ -3425,8 +4078,8 @@ items:
   spec:
     ports:
     - name: metrics
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
     selector:
       app: text-completion-rag
 - apiVersion: apps/v1
@@ -3447,7 +4100,7 @@ items:
           app: workbench-ui
       spec:
         containers:
-        - image: docker.io/trustgraph/workbench-ui:0.4.1
+        - image: docker.io/trustgraph/workbench-ui:1.1.2
           name: workbench-ui
           ports:
           - containerPort: 8888
@@ -3476,3 +4129,4 @@ items:
     selector:
       app: workbench-ui
 kind: List
+

@@ -222,6 +222,15 @@ If AI features aren't working:
 2. Verify AI Endpoints are available in your region
 3. Consider generating a dedicated AI token in the OVHcloud Control Panel
 
+## How I built the config
+
+```
+python3 -m venv env
+. env/bin/activate
+pip install git+https://github.com/trustgraph-ai/trustgraph-templates@master
+tg-configurator -t 1.3 -v 1.3.17 -O > resources.yaml
+```
+
 ## Additional Resources
 
 - [OVHcloud Managed Kubernetes Documentation](https://docs.ovh.com/gb/en/kubernetes/)
