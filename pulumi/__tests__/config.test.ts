@@ -18,7 +18,6 @@ describe("Configuration Loading", () => {
             "project:environment": "test",
             "project:region": "GRA11",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
             "project:ai-endpoints-token": "mock-token",
         });
@@ -30,11 +29,10 @@ describe("Configuration Loading", () => {
 
     test("should load required configuration values", async () => {
         const config = await import("../config");
-        
+
         expect(config.environment).toBe("test");
         expect(config.region).toBe("GRA11");
         expect(config.serviceName).toBe("mock-service-id");
-        expect(config.aiModel).toBe("mistral-nemo-instruct-2407");
         expect(config.aiEndpoint).toBe("mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net");
     });
 
@@ -65,7 +63,6 @@ describe("Configuration Loading", () => {
         pulumi.runtime.setAllConfig({
             "project:region": "GRA11",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
         });
 
@@ -76,7 +73,6 @@ describe("Configuration Loading", () => {
         pulumi.runtime.setAllConfig({
             "project:environment": "test",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
         });
 
@@ -87,18 +83,6 @@ describe("Configuration Loading", () => {
         pulumi.runtime.setAllConfig({
             "project:environment": "test",
             "project:region": "GRA11",
-            "project:ai-model": "mistral-nemo-instruct-2407",
-            "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
-        });
-
-        await expect(import("../config")).rejects.toThrow();
-    });
-
-    test("should handle missing ai-model configuration", async () => {
-        pulumi.runtime.setAllConfig({
-            "project:environment": "test",
-            "project:region": "GRA11",
-            "project:service-name": "mock-service-id",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
         });
 
@@ -110,7 +94,6 @@ describe("Configuration Loading", () => {
             "project:environment": "test",
             "project:region": "GRA11",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
         });
 
         await expect(import("../config")).rejects.toThrow();
@@ -121,16 +104,15 @@ describe("Configuration Loading", () => {
             "project:environment": "test",
             "project:region": "GRA11",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
         });
 
         const config = await import("../config");
-        
+
         // Default node configuration
         expect(config.nodeSize).toBe("b2-15");
         expect(config.nodeCount).toBe(2);
-        
+
         // AI endpoints token should have a default
         expect(config.aiEndpointsToken).toBeDefined();
     });
@@ -140,14 +122,13 @@ describe("Configuration Loading", () => {
             "project:environment": "test",
             "project:region": "GRA11",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
             "project:node-size": "b2-30",
             "project:node-count": "3",
         });
 
         const config = await import("../config");
-        
+
         expect(config.nodeSize).toBe("b2-30");
         expect(config.nodeCount).toBe(3);
     });

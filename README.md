@@ -107,16 +107,10 @@ Edit `Pulumi.ovhcloud.yaml` and update the following values:
 - `trustgraph-ovhcloud:service-name` - Your OVHcloud project ID
 - `trustgraph-ovhcloud:region` - OVHcloud region (e.g., GRA11, BHS5, WAW1, SBG5, UK1, DE1)
 - `trustgraph-ovhcloud:environment` - Environment name (dev, prod, etc.)
-- `trustgraph-ovhcloud:ai-model` - AI model to use (default: mistral-nemo-instruct-2407)
+- `trustgraph-ovhcloud:ai-endpoint` - AI endpoint hostname (e.g., mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net)
 - `trustgraph-ovhcloud:node-size` - Node flavor (default: b2-15)
 - `trustgraph-ovhcloud:node-count` - Number of nodes (default: 2)
 - `trustgraph-ovhcloud:ai-endpoints-token` - Your AI Endpoints access token (encrypted)
-
-Available AI models in OVHcloud AI Endpoints include:
-- `mistral-nemo-instruct-2407`
-- `mixtral-8x7b-instruct-0123`
-- `llama-3-8b-instruct`
-- `codestral-2405`
 
 Available node flavors:
 - `b2-7` - 2 vCPUs, 7GB RAM
@@ -182,12 +176,8 @@ This will allow you to access:
 The deployment automatically configures access to OVHcloud AI Endpoints. The AI
 endpoint URL and authentication token are stored as Kubernetes secrets.
 
-To use a different AI model, update the `ai-model` configuration in your
-Pulumi stack configuration.
-
-For production use, you should generate a proper AI Endpoints token through
-the OVHcloud Control Panel instead of using the automatically generated
-service account credentials.
+To use a different AI model, update the `ai-endpoint` configuration in your
+Pulumi stack configuration to point to a different model endpoint hostname.
 
 ## Destroy
 
@@ -218,11 +208,21 @@ If cluster creation fails:
 ### AI Endpoints Issues
 
 If AI features aren't working:
-1. Check that the AI model name is correct
+1. Check that the AI endpoint hostname is correct
 2. Verify AI Endpoints are available in your region
-3. Consider generating a dedicated AI token in the OVHcloud Control Panel
+3. Ensure your AI Endpoints token is valid
 
 ## How the config was built
+
+There's an AI model specified in config.json. Available AI models in
+OVHcloud AI Endpoints include:
+- `mistral-nemo-instruct-2407`
+- `mixtral-8x7b-instruct-0123`
+- `llama-3-8b-instruct`
+- `codestral-2405`
+
+The AI model specified in the config.json should match the model in the
+AI endpoint hostname specified in the Pulumi config.
 
 ```
 python3 -m venv env

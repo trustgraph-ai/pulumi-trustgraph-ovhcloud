@@ -32,9 +32,6 @@ export const nodeSize = cfg.get("node-size") || "b2-15";
 export const nodeCount = cfg.getNumber("node-count") || 2;
 
 // AI stuff
-// OVHcloud AI models: mistral-nemo-instruct-2407, mixtral-8x7b-instruct, llama-3-8b-instruct, etc.
-export const aiModel = cfg.require("ai-model");
-
 // OVHcloud AI models: e.g. mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net
 export const aiEndpoint = cfg.require("ai-endpoint");
 

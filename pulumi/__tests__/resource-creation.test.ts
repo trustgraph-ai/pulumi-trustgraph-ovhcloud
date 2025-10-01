@@ -97,7 +97,6 @@ describe("Resource Creation Tests", () => {
             "project:environment": "test",
             "project:region": "GRA11",
             "project:service-name": "mock-service-id",
-            "project:ai-model": "mistral-nemo-instruct-2407",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
             "project:ai-endpoints-token": "mock-token",
         });

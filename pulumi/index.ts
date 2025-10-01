@@ -3,7 +3,7 @@ import * as pulumi from '@pulumi/pulumi';
 import * as k8s from '@pulumi/kubernetes';
 import * as fs from 'fs';
 
-import { prefix, region, nodeSize, nodeCount, serviceName, aiModel, aiEndpointsToken, aiEndpoint } from './config';
+import { prefix, region, nodeSize, nodeCount, serviceName, aiEndpointsToken, aiEndpoint } from './config';
 
 // OVHcloud provider
 const provider = new ovh.Provider(

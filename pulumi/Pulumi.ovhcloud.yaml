@@ -3,7 +3,6 @@ config:
   trustgraph-ovhcloud:environment: dev
   trustgraph-ovhcloud:region: UK1
   trustgraph-ovhcloud:service-name: abcdef0123456789abcdef0123456789
-  trustgraph-ovhcloud:ai-model: Mistral-Nemo-Instruct-2407
   trustgraph-ovhcloud:ai-endpoint: mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net
   trustgraph-ovhcloud:node-size: b2-15
   trustgraph-ovhcloud:node-count: "3"
