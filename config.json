@@ -39,17 +39,19 @@
     {
         "name": "openai",
         "parameters": {
-            "temperature": 0.3,
             "max-output-tokens": 4096,
-            "model": "Mistral-Nemo-Instruct-2407"
-        }
-    },
-    {
-        "name": "openai-rag",
-        "parameters": {
-            "temperature": 0.3,
-            "max-output-tokens": 4096,
-            "model": "Mistral-Nemo-Instruct-2407"
+	    "models": {
+		"type": "string",
+		"description": "LLM model to use",
+		"default": "Mistral-Nemo-Instruct-2407",
+		"enum": [
+		    {
+			id: "Mistral-Nemo-Instruct-2407",
+			description: "Mistral Nemo Instruct (2407)"
+		    },
+		],
+		"required": true
+	    }
         }
     }
 ]

@@ -1862,24 +1862,25 @@ items:
       "non-persistent://tg/response/text-completion:default"}, "text-load": "persistent://tg/flow/text-document-load:default",
       "triples": {"request": "non-persistent://tg/request/triples:default", "response":
       "non-persistent://tg/response/triples:default"}, "triples-store": "persistent://tg/flow/triples-store:default"},
-      "parameters": {"chunk-overlap": "50", "chunk-size": "2000", "llm-model": "gpt-4o",
-      "llm-rag-model": "gpt-4o", "llm-rag-temperature": "0.300", "llm-temperature":
-      "0.300"}}}, "flows-active": {"agent-manager": {"default": {"graph-rag-request":
-      "non-persistent://tg/request/graph-rag:default", "graph-rag-response": "non-persistent://tg/response/graph-rag:default",
-      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:default", "mcp-tool-response":
-      "non-persistent://tg/response/mcp-tool:default", "next": "non-persistent://tg/request/agent:default",
-      "prompt-request": "non-persistent://tg/request/prompt:default", "prompt-response":
-      "non-persistent://tg/response/prompt:default", "request": "non-persistent://tg/request/agent:default",
-      "response": "non-persistent://tg/response/agent:default", "structured-query-request":
-      "non-persistent://tg/request/structured-query:default", "structured-query-response":
-      "non-persistent://tg/response/structured-query:default", "text-completion-request":
-      "non-persistent://tg/request/text-completion:default", "text-completion-response":
-      "non-persistent://tg/response/text-completion:default"}}, "chunker": {"default":
-      {"input": "persistent://tg/flow/text-document-load:default", "output": "persistent://tg/flow/chunk-load:default"}},
-      "de-query": {"default": {"request": "non-persistent://tg/request/document-embeddings:default",
-      "response": "non-persistent://tg/response/document-embeddings:default"}}, "de-write":
-      {"default": {"input": "persistent://tg/flow/document-embeddings-store:default"}},
-      "document-embeddings": {"default": {"embeddings-request": "non-persistent://tg/request/embeddings:default",
+      "parameters": {"chunk-overlap": "50", "chunk-size": "2000", "llm-model": "Mistral-Nemo-Instruct-2407",
+      "llm-rag-model": "Mistral-Nemo-Instruct-2407", "llm-rag-temperature": "0.300",
+      "llm-temperature": "0.300"}}}, "flows-active": {"agent-manager": {"default":
+      {"graph-rag-request": "non-persistent://tg/request/graph-rag:default", "graph-rag-response":
+      "non-persistent://tg/response/graph-rag:default", "mcp-tool-request": "non-persistent://tg/request/mcp-tool:default",
+      "mcp-tool-response": "non-persistent://tg/response/mcp-tool:default", "next":
+      "non-persistent://tg/request/agent:default", "prompt-request": "non-persistent://tg/request/prompt:default",
+      "prompt-response": "non-persistent://tg/response/prompt:default", "request":
+      "non-persistent://tg/request/agent:default", "response": "non-persistent://tg/response/agent:default",
+      "structured-query-request": "non-persistent://tg/request/structured-query:default",
+      "structured-query-response": "non-persistent://tg/response/structured-query:default",
+      "text-completion-request": "non-persistent://tg/request/text-completion:default",
+      "text-completion-response": "non-persistent://tg/response/text-completion:default"}},
+      "chunker": {"default": {"input": "persistent://tg/flow/text-document-load:default",
+      "output": "persistent://tg/flow/chunk-load:default"}}, "de-query": {"default":
+      {"request": "non-persistent://tg/request/document-embeddings:default", "response":
+      "non-persistent://tg/response/document-embeddings:default"}}, "de-write": {"default":
+      {"input": "persistent://tg/flow/document-embeddings-store:default"}}, "document-embeddings":
+      {"default": {"embeddings-request": "non-persistent://tg/request/embeddings:default",
       "embeddings-response": "non-persistent://tg/response/embeddings:default", "input":
       "persistent://tg/flow/chunk-load:default", "output": "persistent://tg/flow/document-embeddings-store:default"}},
       "document-rag": {"default": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:default",
@@ -1943,9 +1944,9 @@ items:
       "non-persistent://tg/request/objects:default", "objects-query-response": "non-persistent://tg/response/objects:default",
       "request": "non-persistent://tg/request/structured-query:default", "response":
       "non-persistent://tg/response/structured-query:default"}}, "text-completion":
-      {"default": {"model": "gpt-4o", "request": "non-persistent://tg/request/text-completion:default",
+      {"default": {"model": "Mistral-Nemo-Instruct-2407", "request": "non-persistent://tg/request/text-completion:default",
       "response": "non-persistent://tg/response/text-completion:default"}}, "text-completion-rag":
-      {"default": {"model": "gpt-4o", "request": "non-persistent://tg/request/text-completion-rag:default",
+      {"default": {"model": "Mistral-Nemo-Instruct-2407", "request": "non-persistent://tg/request/text-completion-rag:default",
       "response": "non-persistent://tg/response/text-completion-rag:default"}}, "triples-query":
       {"default": {"request": "non-persistent://tg/request/triples:default", "response":
       "non-persistent://tg/response/triples:default"}}, "triples-write": {"default":
@@ -1974,11 +1975,9 @@ items:
       50 .. 100", "max": 8000, "min": 0, "placeholder": 50, "required": true, "type":
       "integer"}, "chunk-size": {"default": 2000, "description": "Chunk size", "helper":
       "An integer, usually 2000 .. 8000", "max": 32768, "min": 0, "placeholder": 2000,
-      "required": true, "type": "integer"}, "llm-model": {"default": "gpt-4o", "description":
-      "LLM model to use", "enum": [{"description": "GPT-4o (latest)", "id": "gpt-4o"},
-      {"description": "GPT-4o Mini", "id": "gpt-4o-mini"}, {"description": "GPT-4
-      Turbo", "id": "gpt-4-turbo"}, {"description": "GPT-4", "id": "gpt-4"}, {"description":
-      "GPT-3.5 Turbo", "id": "gpt-3.5-turbo"}], "required": true, "type": "string"},
+      "required": true, "type": "integer"}, "llm-model": {"default": "Mistral-Nemo-Instruct-2407",
+      "description": "LLM model to use", "enum": [{"description": "Mistral Nemo Instruct
+      (2407)", "id": "Mistral-Nemo-Instruct-2407"}], "required": true, "type": "string"},
       "llm-temperature": {"default": 0.3, "description": "LLM temperature", "helper":
       "A floating point number between 0 and 1", "max": 10, "min": 0, "placeholder":
       0.3, "required": true, "type": "float"}}, "prompt": {"system": "You are a helpful
@@ -4674,7 +4673,7 @@ items:
           - -x
           - '4096'
           - -t
-          - '0.300'
+          - '0.000'
           - --log-level
           - DEBUG
           env:
@@ -4740,7 +4739,7 @@ items:
           - -x
           - '4096'
           - -t
-          - '0.300'
+          - '0.000'
           - --log-level
           - DEBUG
           env:
