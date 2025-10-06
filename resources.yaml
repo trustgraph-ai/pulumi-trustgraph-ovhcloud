@@ -1976,21 +1976,22 @@ items:
       "integer"}, "chunk-size": {"default": 2000, "description": "Chunk size", "helper":
       "An integer, usually 2000 .. 8000", "max": 32768, "min": 0, "placeholder": 2000,
       "required": true, "type": "integer"}, "llm-model": {"default": "Mistral-Nemo-Instruct-2407",
-      "description": "LLM model to use", "enum": [{"description": "Mistral Nemo Instruct
-      (2407)", "id": "Mistral-Nemo-Instruct-2407"}], "required": true, "type": "string"},
-      "llm-temperature": {"default": 0.3, "description": "LLM temperature", "helper":
-      "A floating point number between 0 and 1", "max": 10, "min": 0, "placeholder":
-      0.3, "required": true, "type": "float"}}, "prompt": {"system": "You are a helpful
-      assistant.", "template-index": ["agent-kg-extract", "agent-react", "diagnose-csv",
-      "diagnose-json", "diagnose-structured-data", "diagnose-xml", "document-prompt",
-      "extract-definitions", "extract-relationships", "extract-rows", "extract-topics",
-      "graphql-generation", "kg-prompt", "question", "schema-selection"], "template.agent-kg-extract":
-      {"prompt": "Analyze the following text and extract both entity definitions and
-      relationships. Return the results as JSON with ''definitions'' and ''relationships''
-      arrays.\n\nFor definitions, extract entities and their explanations or descriptions.\nFor
-      relationships, extract subject-predicate-object triples where subjects and objects
-      are entities, and predicates are relationship types.\n\nText: {{text}}\n\nReturn
-      JSON only, no other text. Use this exact format:\n{\n  \"definitions\": [\n    {\n      \"entity\":
+      "description": "LLM model to use", "enum": [{"description": "Mistral small 3.2
+      24b instruct (2506)", "id": "Mistral-\u200bSmall-\u200b3.2-\u200b24B-\u200bInstruct-\u200b2506"}],
+      "required": true, "type": "string"}, "llm-temperature": {"default": 0.3, "description":
+      "LLM temperature", "helper": "A floating point number between 0 and 1", "max":
+      10, "min": 0, "placeholder": 0.3, "required": true, "type": "float"}}, "prompt":
+      {"system": "You are a helpful assistant.", "template-index": ["agent-kg-extract",
+      "agent-react", "diagnose-csv", "diagnose-json", "diagnose-structured-data",
+      "diagnose-xml", "document-prompt", "extract-definitions", "extract-relationships",
+      "extract-rows", "extract-topics", "graphql-generation", "kg-prompt", "question",
+      "schema-selection"], "template.agent-kg-extract": {"prompt": "Analyze the following
+      text and extract both entity definitions and relationships. Return the results
+      as JSON with ''definitions'' and ''relationships'' arrays.\n\nFor definitions,
+      extract entities and their explanations or descriptions.\nFor relationships,
+      extract subject-predicate-object triples where subjects and objects are entities,
+      and predicates are relationship types.\n\nText: {{text}}\n\nReturn JSON only,
+      no other text. Use this exact format:\n{\n  \"definitions\": [\n    {\n      \"entity\":
       \"entity_name\",\n      \"definition\": \"definition_text\"\n    }\n  ],\n  \"relationships\":
       [\n    {\n      \"subject\": \"subject_entity\",\n      \"predicate\": \"relationship_type\",\n      \"object\":
       \"object_entity_or_literal\",\n      \"object-entity\": true\n    }\n  ]\n}\n",
