@@ -56,7 +56,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: agent-manager
           resources:
             limits:
@@ -115,7 +115,7 @@ items:
               secretKeyRef:
                 key: gateway-secret
                 name: gateway-secret
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: api-gateway
           ports:
           - containerPort: 8088
@@ -241,7 +241,7 @@ items:
           - '100'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: chunker
           resources:
             limits:
@@ -290,7 +290,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: config-svc
           resources:
             limits:
@@ -385,7 +385,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: document-embeddings
           resources:
             limits:
@@ -436,7 +436,7 @@ items:
           - '20'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: document-rag
           resources:
             limits:
@@ -485,11 +485,9 @@ items:
           - pulsar://pulsar:6650
           - --concurrency
           - '1'
-          - -m
-          - sentence-transformers/all-MiniLM-L6-v2
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: embeddings
           resources:
             limits:
@@ -557,8 +555,123 @@ items:
       \        \"hide\": true,\n        \"iconColor\": \"rgba(0, 211, 255, 1)\",\n\
       \        \"name\": \"Annotations & Alerts\",\n        \"type\": \"dashboard\"\
       \n      }\n    ]\n  },\n  \"editable\": true,\n  \"fiscalYearStartMonth\": 0,\n\
-      \  \"graphTooltip\": 0,\n  \"id\": 2,\n  \"links\": [],\n  \"liveNow\": false,\n\
-      \  \"panels\": [\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\"\
+      \  \"graphTooltip\": 0,\n  \"id\": 2,\n  \"links\": [],\n  \"panels\": [\n \
+      \   {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
+      uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\"\
+      : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":\
+      \ \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
+      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
+      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
+      \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
+      \         \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n \
+      \           \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n \
+      \           \"hideFrom\": {\n              \"legend\": false,\n            \
+      \  \"tooltip\": false,\n              \"viz\": false\n            },\n     \
+      \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 12,\n   \
+      \     \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 17,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"editorMode\": \"code\",\n          \"expr\": \"producer_count_total{processor=\\\
+      \"chunker\\\",name=\\\"output\\\"}\\n- ignoring(instance, job, processor, name,\
+      \ status)\\nprocessing_count_total{processor=\\\"kg-extract-relationships\\\"\
+      , name=\\\"input\\\"}\",\n          \"legendFormat\": \"__auto\",\n        \
+      \  \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n     \
+      \ \"title\": \"Knowledge extraction backlog\",\n      \"type\": \"timeseries\"\
+      \n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
+      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
+      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
+      \        \"mode\": \"palette-classic\"\n          },\n          \"custom\":\
+      \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
+      : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
+      : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 6,\n    \
+      \    \"x\": 12,\n        \"y\": 0\n      },\n      \"id\": 19,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"editorMode\": \"code\",\n          \"expr\": \"(producer_count_total{processor=\\\
+      \"graph-embeddings\\\",name=\\\"output\\\"} - ignoring(instance, job, processor,\
+      \ name, status) processing_count_total{processor=\\\"ge-write\\\",name=\\\"\
+      input\\\"} >= 2)\\nor\\n(0 * (producer_count_total{processor=\\\"graph-embeddings\\\
+      \",name=\\\"output\\\"} - ignoring(instance, job, processor, name, status) processing_count_total{processor=\\\
+      \"ge-write\\\",name=\\\"input\\\"}))\",\n          \"legendFormat\": \"__auto\"\
+      ,\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n     \
+      \ ],\n      \"title\": \"Graph embeddings backlog\",\n      \"type\": \"timeseries\"\
+      \n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
+      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
+      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
+      \        \"mode\": \"palette-classic\"\n          },\n          \"custom\":\
+      \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
+      : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
+      : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 6,\n    \
+      \    \"x\": 18,\n        \"y\": 0\n      },\n      \"id\": 18,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"editorMode\": \"code\",\n          \"expr\": \"(clamp_min(\\\
+      n  (\\n    producer_count_total{processor=\\\"kg-extract-definitions\\\",name=\\\
+      \"triples\\\"}\\n    + on(flow)\\n    producer_count_total{processor=\\\"kg-extract-relationships\\\
+      \",name=\\\"triples\\\"}\\n  )\\n  - on(flow) processing_count_total{processor=\\\
+      \"triples-write\\\",name=\\\"input\\\"},\\n  0\\n) >= 2) or (0 * clamp_min(\\\
+      n  (\\n    producer_count_total{processor=\\\"kg-extract-definitions\\\",name=\\\
+      \"triples\\\"}\\n    + on(flow)\\n    producer_count_total{processor=\\\"kg-extract-relationships\\\
+      \",name=\\\"triples\\\"}\\n  )\\n  - on(flow) processing_count_total{processor=\\\
+      \"triples-write\\\",name=\\\"input\\\"},\\n  0\\n))\",\n          \"legendFormat\"\
+      : \"__auto\",\n          \"range\": true,\n          \"refId\": \"A\"\n    \
+      \    }\n      ],\n      \"title\": \"Triples backlog\",\n      \"type\": \"\
+      timeseries\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\"\
       ,\n        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n   \
       \   \"fieldConfig\": {\n        \"defaults\": {\n          \"custom\": {\n \
       \           \"hideFrom\": {\n              \"legend\": false,\n            \
@@ -566,7 +679,7 @@ items:
       \       \"scaleDistribution\": {\n              \"type\": \"linear\"\n     \
       \       }\n          }\n        },\n        \"overrides\": []\n      },\n  \
       \    \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n\
-      \        \"y\": 0\n      },\n      \"id\": 7,\n      \"options\": {\n      \
+      \        \"y\": 7\n      },\n      \"id\": 7,\n      \"options\": {\n      \
       \  \"calculate\": false,\n        \"cellGap\": 1,\n        \"color\": {\n  \
       \        \"exponent\": 0.5,\n          \"fill\": \"dark-orange\",\n        \
       \  \"mode\": \"scheme\",\n          \"reverse\": false,\n          \"scale\"\
@@ -578,7 +691,7 @@ items:
       \        \"mode\": \"single\",\n          \"showColorScale\": false,\n     \
       \     \"yHistogram\": false\n        },\n        \"yAxis\": {\n          \"\
       axisPlacement\": \"left\",\n          \"reverse\": false\n        }\n      },\n\
-      \      \"pluginVersion\": \"11.1.4\",\n      \"targets\": [\n        {\n   \
+      \      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n        {\n   \
       \       \"datasource\": {\n            \"type\": \"prometheus\",\n         \
       \   \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n      \
       \    \"disableTextWrap\": false,\n          \"editorMode\": \"builder\",\n \
@@ -595,7 +708,7 @@ items:
       \             \"viz\": false\n            },\n            \"scaleDistribution\"\
       : {\n              \"type\": \"linear\"\n            }\n          }\n      \
       \  },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n        \"\
-      h\": 8,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 0\n      },\n\
+      h\": 8,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 7\n      },\n\
       \      \"id\": 2,\n      \"options\": {\n        \"calculate\": false,\n   \
       \     \"cellGap\": 5,\n        \"cellValues\": {\n          \"unit\": \"\"\n\
       \        },\n        \"color\": {\n          \"exponent\": 0.5,\n          \"\
@@ -609,7 +722,7 @@ items:
       \          \"showColorScale\": false,\n          \"yHistogram\": false\n   \
       \     },\n        \"yAxis\": {\n          \"axisLabel\": \"processing status\"\
       ,\n          \"axisPlacement\": \"left\",\n          \"reverse\": false\n  \
-      \      }\n      },\n      \"pluginVersion\": \"11.1.4\",\n      \"targets\"\
+      \      }\n      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\"\
       : [\n        {\n          \"datasource\": {\n            \"type\": \"prometheus\"\
       ,\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n         \
       \ },\n          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
@@ -626,31 +739,33 @@ items:
       \    \"custom\": {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
       : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
       : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
-      : 0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n\
-      \            \"gradientMode\": \"none\",\n            \"hideFrom\": {\n    \
-      \          \"legend\": false,\n              \"tooltip\": false,\n         \
-      \     \"viz\": false\n            },\n            \"insertNulls\": false,\n\
-      \            \"lineInterpolation\": \"linear\",\n            \"lineWidth\":\
-      \ 1,\n            \"pointSize\": 5,\n            \"scaleDistribution\": {\n\
-      \              \"type\": \"linear\"\n            },\n            \"showPoints\"\
-      : \"auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n\
-      \              \"group\": \"A\",\n              \"mode\": \"none\"\n       \
-      \     },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\
-      \n            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
-      \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 9,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 8\n\
-      \      },\n      \"id\": 1,\n      \"options\": {\n        \"legend\": {\n \
-      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
-      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"targets\": [\n        {\n          \"datasource\"\
-      : {\n            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"sum by(processor) (rate(request_latency_count{processor!=\\\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 9,\n        \"w\": 12,\n   \
+      \     \"x\": 0,\n        \"y\": 15\n      },\n      \"id\": 1,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
+      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
+      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
+      ,\n          \"expr\": \"sum by(processor) (rate(request_latency_count{processor!=\\\
       \"config-svc\\\"}[$__rate_interval]))\",\n          \"fullMetaSearch\": false,\n\
       \          \"includeNullMetadata\": true,\n          \"instant\": false,\n \
       \         \"legendFormat\": \"{{job}}\",\n          \"range\": true,\n     \
@@ -663,32 +778,33 @@ items:
       axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
       \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
       \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
-      \         \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n      \
-      \      \"gradientMode\": \"none\",\n            \"hideFrom\": {\n          \
-      \    \"legend\": false,\n              \"tooltip\": false,\n              \"\
-      viz\": false\n            },\n            \"insertNulls\": false,\n        \
-      \    \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 1,\n   \
-      \         \"pointSize\": 5,\n            \"scaleDistribution\": {\n        \
-      \      \"type\": \"linear\"\n            },\n            \"showPoints\": \"\
-      auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n  \
-      \            \"group\": \"A\",\n              \"mode\": \"none\"\n         \
-      \   },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\n\
-      \            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
-      \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 9,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 8\n\
-      \      },\n      \"id\": 5,\n      \"options\": {\n        \"legend\": {\n \
-      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
-      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"\
-      targets\": [\n        {\n          \"datasource\": {\n            \"type\":\
-      \ \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"pulsar_msg_backlog{topic!=\\\"persistent://tg/config/config\\\
+      \         \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n \
+      \           \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n \
+      \           \"hideFrom\": {\n              \"legend\": false,\n            \
+      \  \"tooltip\": false,\n              \"viz\": false\n            },\n     \
+      \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 9,\n        \"w\": 12,\n   \
+      \     \"x\": 12,\n        \"y\": 15\n      },\n      \"id\": 5,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
+      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
+      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
+      ,\n          \"expr\": \"pulsar_msg_backlog{topic!=\\\"persistent://tg/config/config\\\
       \"}\",\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\"\
       : true,\n          \"instant\": false,\n          \"legendFormat\": \"{{topic}}\"\
       ,\n          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
@@ -709,98 +825,99 @@ items:
       \n            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
       : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
       \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 7,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 17\n\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 24\n\
       \      },\n      \"id\": 10,\n      \"options\": {\n        \"barRadius\": 0,\n\
       \        \"barWidth\": 0.97,\n        \"fullHighlight\": false,\n        \"\
       groupWidth\": 0.7,\n        \"legend\": {\n          \"calcs\": [],\n      \
       \    \"displayMode\": \"list\",\n          \"placement\": \"bottom\",\n    \
       \      \"showLegend\": true\n        },\n        \"orientation\": \"auto\",\n\
       \        \"showValue\": \"auto\",\n        \"stacking\": \"none\",\n       \
-      \ \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"none\"\
-      \n        },\n        \"xTickLabelRotation\": 0,\n        \"xTickLabelSpacing\"\
-      : 0\n      },\n      \"pluginVersion\": \"11.1.4\",\n      \"targets\": [\n\
-      \        {\n          \"datasource\": {\n            \"type\": \"prometheus\"\
-      ,\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n         \
-      \ },\n          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"exemplar\": false,\n          \"expr\": \"max by(le) (chunk_size_bucket)\"\
-      ,\n          \"format\": \"heatmap\",\n          \"fullMetaSearch\": false,\n\
-      \          \"includeNullMetadata\": false,\n          \"instant\": true,\n \
-      \         \"legendFormat\": \"{{le}}\",\n          \"range\": false,\n     \
-      \     \"refId\": \"A\",\n          \"useBackend\": false\n        }\n      ],\n\
-      \      \"title\": \"Chunk size\",\n      \"type\": \"barchart\"\n    },\n  \
-      \  {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
-      uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\"\
-      : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":\
-      \ \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
-      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
-      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
-      \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
-      \         \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n      \
-      \      \"gradientMode\": \"none\",\n            \"hideFrom\": {\n          \
-      \    \"legend\": false,\n              \"tooltip\": false,\n              \"\
-      viz\": false\n            },\n            \"insertNulls\": false,\n        \
-      \    \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 1,\n   \
-      \         \"pointSize\": 5,\n            \"scaleDistribution\": {\n        \
-      \      \"type\": \"linear\"\n            },\n            \"showPoints\": \"\
-      auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n  \
-      \            \"group\": \"A\",\n              \"mode\": \"none\"\n         \
-      \   },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\n\
-      \            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
-      \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 7,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 17\n\
-      \      },\n      \"id\": 11,\n      \"options\": {\n        \"legend\": {\n\
-      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
-      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"pluginVersion\": \"11.1.4\",\n      \"\
-      targets\": [\n        {\n          \"datasource\": {\n            \"type\":\
-      \ \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \ \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"single\"\
+      ,\n          \"sort\": \"none\"\n        },\n        \"xTickLabelRotation\"\
+      : 0,\n        \"xTickLabelSpacing\": 0\n      },\n      \"pluginVersion\": \"\
+      12.1.1\",\n      \"targets\": [\n        {\n          \"datasource\": {\n  \
+      \          \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"exemplar\": false,\n          \"expr\": \"sum by(job)\
-      \ (increase(rate_limit_count_total[$__rate_interval]))\",\n          \"format\"\
-      : \"time_series\",\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\"\
-      : true,\n          \"instant\": false,\n          \"legendFormat\": \"{{instance}}\"\
-      ,\n          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
-      : false\n        }\n      ],\n      \"title\": \"Rate limit events\",\n    \
-      \  \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\n      \
-      \  \"type\": \"prometheus\",\n        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
-      color\": {\n            \"fixedColor\": \"light-blue\",\n            \"mode\"\
-      : \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
-      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
-      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
-      \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
-      \         \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n      \
-      \      \"gradientMode\": \"none\",\n            \"hideFrom\": {\n          \
-      \    \"legend\": false,\n              \"tooltip\": false,\n              \"\
-      viz\": false\n            },\n            \"insertNulls\": false,\n        \
-      \    \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 1,\n   \
-      \         \"pointSize\": 5,\n            \"scaleDistribution\": {\n        \
-      \      \"type\": \"linear\"\n            },\n            \"showPoints\": \"\
-      auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n  \
-      \            \"group\": \"A\",\n              \"mode\": \"none\"\n         \
-      \   },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\n\
-      \            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : \"builder\",\n          \"exemplar\": false,\n          \"expr\": \"max by(le)\
+      \ (chunk_size_bucket)\",\n          \"format\": \"heatmap\",\n          \"fullMetaSearch\"\
+      : false,\n          \"includeNullMetadata\": false,\n          \"instant\":\
+      \ true,\n          \"legendFormat\": \"{{le}}\",\n          \"range\": false,\n\
+      \          \"refId\": \"A\",\n          \"useBackend\": false\n        }\n \
+      \     ],\n      \"title\": \"Chunk size\",\n      \"type\": \"barchart\"\n \
+      \   },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
+      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
+      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
+      \        \"mode\": \"palette-classic\"\n          },\n          \"custom\":\
+      \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
+      : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
+      : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 12,\n   \
+      \     \"x\": 12,\n        \"y\": 24\n      },\n      \"id\": 11,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
+      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
+      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
+      ,\n          \"exemplar\": false,\n          \"expr\": \"sum by(job) (increase(rate_limit_count_total[$__rate_interval]))\"\
+      ,\n          \"format\": \"time_series\",\n          \"fullMetaSearch\": false,\n\
+      \          \"includeNullMetadata\": true,\n          \"instant\": false,\n \
+      \         \"legendFormat\": \"{{instance}}\",\n          \"range\": true,\n\
+      \          \"refId\": \"A\",\n          \"useBackend\": false\n        }\n \
+      \     ],\n      \"title\": \"Rate limit events\",\n      \"type\": \"timeseries\"\
+      \n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
+      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
+      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
+      \        \"fixedColor\": \"light-blue\",\n            \"mode\": \"palette-classic\"\
+      \n          },\n          \"custom\": {\n            \"axisBorderShow\": false,\n\
+      \            \"axisCenteredZero\": false,\n            \"axisColorMode\": \"\
+      text\",\n            \"axisLabel\": \"\",\n            \"axisPlacement\": \"\
+      auto\",\n            \"barAlignment\": 0,\n            \"barWidthFactor\": 0.6,\n\
+      \            \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n   \
+      \         \"gradientMode\": \"none\",\n            \"hideFrom\": {\n       \
+      \       \"legend\": false,\n              \"tooltip\": false,\n            \
+      \  \"viz\": false\n            },\n            \"insertNulls\": false,\n   \
+      \         \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 1,\n\
+      \            \"pointSize\": 5,\n            \"scaleDistribution\": {\n     \
+      \         \"type\": \"linear\"\n            },\n            \"showPoints\":\
+      \ \"auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n\
+      \              \"group\": \"A\",\n              \"mode\": \"none\"\n       \
+      \     },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\
+      \n            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
       : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
       \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 24\n\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 8,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 31\n\
       \      },\n      \"id\": 12,\n      \"options\": {\n        \"legend\": {\n\
       \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
       placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"pluginVersion\": \"11.1.4\",\n      \"\
-      targets\": [\n        {\n          \"datasource\": {\n            \"type\":\
-      \ \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.1.1\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
       : \"builder\",\n          \"expr\": \"rate(process_cpu_seconds_total[$__rate_interval])\"\
       ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
@@ -814,33 +931,35 @@ items:
       : {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
       : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
       : \"GB\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
-      : 0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n\
-      \            \"gradientMode\": \"none\",\n            \"hideFrom\": {\n    \
-      \          \"legend\": false,\n              \"tooltip\": false,\n         \
-      \     \"viz\": false\n            },\n            \"insertNulls\": false,\n\
-      \            \"lineInterpolation\": \"linear\",\n            \"lineWidth\":\
-      \ 1,\n            \"pointSize\": 5,\n            \"scaleDistribution\": {\n\
-      \              \"type\": \"linear\"\n            },\n            \"showPoints\"\
-      : \"auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n\
-      \              \"group\": \"A\",\n              \"mode\": \"none\"\n       \
-      \     },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\
-      \n            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
-      \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 8,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 24\n\
-      \      },\n      \"id\": 13,\n      \"options\": {\n        \"legend\": {\n\
-      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
-      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"targets\": [\n        {\n          \"datasource\"\
-      : {\n            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"process_resident_memory_bytes / 1073741824\"\
-      ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
-      \ true,\n          \"instant\": false,\n          \"legendFormat\": \"{{instance}}\"\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n   \
+      \     \"x\": 12,\n        \"y\": 31\n      },\n      \"id\": 13,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
+      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
+      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
+      ,\n          \"expr\": \"process_resident_memory_bytes / 1073741824\",\n   \
+      \       \"fullMetaSearch\": false,\n          \"includeNullMetadata\": true,\n\
+      \          \"instant\": false,\n          \"legendFormat\": \"{{instance}}\"\
       ,\n          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
       : false\n        }\n      ],\n      \"title\": \"Memory\",\n      \"type\":\
       \ \"timeseries\"\n    },\n    {\n      \"datasource\": {\n        \"type\":\
@@ -852,15 +971,15 @@ items:
       : false,\n            \"inspect\": false\n          },\n          \"mappings\"\
       : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n  \
       \          \"steps\": [\n              {\n                \"color\": \"green\"\
-      ,\n                \"value\": null\n              },\n              {\n    \
-      \            \"color\": \"red\",\n                \"value\": 80\n          \
-      \    }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n    \
-      \    \"x\": 0,\n        \"y\": 32\n      },\n      \"id\": 14,\n      \"options\"\
+      ,\n                \"value\": 0\n              },\n              {\n       \
+      \         \"color\": \"red\",\n                \"value\": 80\n             \
+      \ }\n            ]\n          }\n        },\n        \"overrides\": []\n   \
+      \   },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n       \
+      \ \"x\": 0,\n        \"y\": 39\n      },\n      \"id\": 14,\n      \"options\"\
       : {\n        \"cellHeight\": \"sm\",\n        \"footer\": {\n          \"countRows\"\
       : false,\n          \"fields\": \"\",\n          \"reducer\": [\n          \
       \  \"sum\"\n          ],\n          \"show\": false\n        },\n        \"\
-      showHeader\": true\n      },\n      \"pluginVersion\": \"11.1.4\",\n      \"\
+      showHeader\": true\n      },\n      \"pluginVersion\": \"12.1.1\",\n      \"\
       targets\": [\n        {\n          \"datasource\": {\n            \"type\":\
       \ \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
@@ -887,31 +1006,33 @@ items:
       \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
       : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
       : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
-      : 0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n\
-      \            \"gradientMode\": \"none\",\n            \"hideFrom\": {\n    \
-      \          \"legend\": false,\n              \"tooltip\": false,\n         \
-      \     \"viz\": false\n            },\n            \"insertNulls\": false,\n\
-      \            \"lineInterpolation\": \"linear\",\n            \"lineWidth\":\
-      \ 1,\n            \"pointSize\": 5,\n            \"scaleDistribution\": {\n\
-      \              \"type\": \"linear\"\n            },\n            \"showPoints\"\
-      : \"auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n\
-      \              \"group\": \"A\",\n              \"mode\": \"none\"\n       \
-      \     },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\
-      \n            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
-      \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 7,\n        \"w\": 8,\n        \"x\": 8,\n        \"y\": 32\n\
-      \      },\n      \"id\": 15,\n      \"options\": {\n        \"legend\": {\n\
-      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
-      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"targets\": [\n        {\n          \"datasource\"\
-      : {\n            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"sum by(job) (rate(input_tokens_total[$__rate_interval]))\"\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n    \
+      \    \"x\": 8,\n        \"y\": 39\n      },\n      \"id\": 15,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
+      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
+      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
+      ,\n          \"expr\": \"sum by(job) (rate(input_tokens_total[$__rate_interval]))\"\
       ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
       \ true,\n          \"instant\": false,\n          \"legendFormat\": \"input\
       \ {{job}}\",\n          \"range\": true,\n          \"refId\": \"A\",\n    \
@@ -931,31 +1052,33 @@ items:
       axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
       \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"$\",\n    \
       \        \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n  \
-      \          \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n     \
-      \       \"gradientMode\": \"none\",\n            \"hideFrom\": {\n         \
-      \     \"legend\": false,\n              \"tooltip\": false,\n              \"\
-      viz\": false\n            },\n            \"insertNulls\": false,\n        \
-      \    \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 1,\n   \
-      \         \"pointSize\": 5,\n            \"scaleDistribution\": {\n        \
-      \      \"type\": \"linear\"\n            },\n            \"showPoints\": \"\
-      auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n  \
-      \            \"group\": \"A\",\n              \"mode\": \"none\"\n         \
-      \   },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\n\
-      \            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
-      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
-      \       {\n                \"color\": \"green\",\n                \"value\"\
-      : null\n              },\n              {\n                \"color\": \"red\"\
-      ,\n                \"value\": 80\n              }\n            ]\n         \
-      \ }\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n\
-      \        \"h\": 7,\n        \"w\": 8,\n        \"x\": 16,\n        \"y\": 32\n\
-      \      },\n      \"id\": 16,\n      \"options\": {\n        \"legend\": {\n\
-      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
-      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
-      \   \"tooltip\": {\n          \"mode\": \"single\",\n          \"sort\": \"\
-      none\"\n        }\n      },\n      \"targets\": [\n        {\n          \"datasource\"\
-      : {\n            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"sum by(job) (rate(input_cost_total[$__rate_interval]))\"\
+      \          \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n\
+      \            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      \            \"hideFrom\": {\n              \"legend\": false,\n           \
+      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
+      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
+      \            \"stacking\": {\n              \"group\": \"A\",\n            \
+      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
+      \              \"mode\": \"off\"\n            }\n          },\n          \"\
+      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+      ,\n            \"steps\": [\n              {\n                \"color\": \"\
+      green\",\n                \"value\": 0\n              },\n              {\n\
+      \                \"color\": \"red\",\n                \"value\": 80\n      \
+      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n    \
+      \    \"x\": 16,\n        \"y\": 39\n      },\n      \"id\": 16,\n      \"options\"\
+      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
+      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
+      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
+      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
+      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
+      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
+      ,\n          \"expr\": \"sum by(job) (rate(input_cost_total[$__rate_interval]))\"\
       ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
       \ true,\n          \"instant\": false,\n          \"legendFormat\": \"input\
       \ {{job}}\",\n          \"range\": true,\n          \"refId\": \"A\",\n    \
@@ -968,11 +1091,11 @@ items:
       \   \"legendFormat\": \"output {{job}}\",\n          \"range\": true,\n    \
       \      \"refId\": \"B\",\n          \"useBackend\": false\n        }\n     \
       \ ],\n      \"title\": \"Token cost\",\n      \"type\": \"timeseries\"\n   \
-      \ }\n  ],\n  \"refresh\": \"5s\",\n  \"schemaVersion\": 39,\n  \"tags\": [],\n\
-      \  \"templating\": {\n    \"list\": []\n  },\n  \"time\": {\n    \"from\": \"\
-      now-15m\",\n    \"to\": \"now\"\n  },\n  \"timepicker\": {},\n  \"timezone\"\
-      : \"\",\n  \"title\": \"Overview\",\n  \"uid\": \"b5c8abf8-fe79-496b-b028-10bde917d1f0\"\
-      ,\n  \"version\": 1,\n  \"weekStart\": \"\"\n}\n"
+      \ }\n  ],\n  \"preload\": false,\n  \"refresh\": \"5s\",\n  \"schemaVersion\"\
+      : 41,\n  \"tags\": [],\n  \"templating\": {\n    \"list\": []\n  },\n  \"time\"\
+      : {\n    \"from\": \"now-1h\",\n    \"to\": \"now\"\n  },\n  \"timepicker\"\
+      : {},\n  \"timezone\": \"\",\n  \"title\": \"Overview\",\n  \"uid\": \"b5c8abf8-fe79-496b-b028-10bde917d1f0\"\
+      ,\n  \"version\": 12\n}"
   kind: ConfigMap
   metadata:
     name: dashboards
@@ -1071,7 +1194,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: graph-embeddings
           resources:
             limits:
@@ -1128,7 +1251,7 @@ items:
           - '2'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: graph-rag
           resources:
             limits:
@@ -1156,20 +1279,21 @@ items:
 - apiVersion: v1
   data:
     config.json: '{"flow-classes": {"document-rag": {"class": {}, "description": "DocumentRAG
-      only", "flow": {"chunker:{id}": {"input": "persistent://tg/flow/text-document-load:{id}",
-      "output": "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request":
-      "non-persistent://tg/request/document-embeddings:{id}", "response": "non-persistent://tg/response/document-embeddings:{id}"},
-      "de-write:{id}": {"input": "persistent://tg/flow/document-embeddings-store:{id}"},
-      "document-embeddings:{id}": {"embeddings-request": "non-persistent://tg/request/embeddings:{id}",
-      "embeddings-response": "non-persistent://tg/response/embeddings:{id}", "input":
-      "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/document-embeddings-store:{id}"},
-      "document-rag:{id}": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
+      only", "flow": {"chunker:{id}": {"chunk-overlap": "{chunk-overlap}", "chunk-size":
+      "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}", "output":
+      "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request": "non-persistent://tg/request/document-embeddings:{id}",
+      "response": "non-persistent://tg/response/document-embeddings:{id}"}, "de-write:{id}":
+      {"input": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-embeddings:{id}":
+      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
+      "non-persistent://tg/response/embeddings:{id}", "input": "persistent://tg/flow/chunk-load:{id}",
+      "output": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-rag:{id}":
+      {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
       "document-embeddings-response": "non-persistent://tg/response/document-embeddings:{id}",
       "embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
       "non-persistent://tg/response/embeddings:{id}", "prompt-request": "non-persistent://tg/request/prompt-rag:{id}",
       "prompt-response": "non-persistent://tg/response/prompt-rag:{id}", "request":
       "non-persistent://tg/request/document-rag:{id}", "response": "non-persistent://tg/response/document-rag:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings:{id}": {"model": "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "mcp-tool:{id}":
       {"request": "non-persistent://tg/request/mcp-tool:{id}", "response": "non-persistent://tg/response/mcp-tool:{id}",
       "text-completion-request": "non-persistent://tg/request/text-completion:{id}",
@@ -1200,39 +1324,41 @@ items:
       {"request": "non-persistent://tg/request/text-completion:{id}", "response":
       "non-persistent://tg/response/text-completion:{id}"}, "text-load": "persistent://tg/flow/text-document-load:{id}"},
       "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
-      "order": 6, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
-      "Chunk size", "order": 5, "type": "chunk-size"}, "llm-model": {"advanced": false,
-      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
-      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
-      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
-      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
-      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
-      3, "type": "llm-temperature"}}, "tags": ["document-rag"]}, "document-rag+graph-rag":
-      {"class": {}, "description": "Supports GraphRAG and document RAG, no core creation",
-      "flow": {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
-      "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request":
-      "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}",
-      "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
-      "prompt-response": "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["document-rag"]},
+      "document-rag+graph-rag": {"class": {}, "description": "Supports GraphRAG and
+      document RAG, no core creation", "flow": {"agent-manager:{id}": {"graph-rag-request":
+      "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}",
+      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response":
+      "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
+      "prompt-request": "non-persistent://tg/request/prompt:{id}", "prompt-response":
+      "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
       "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "de-query:{id}": {"request": "non-persistent://tg/request/document-embeddings:{id}",
-      "response": "non-persistent://tg/response/document-embeddings:{id}"}, "de-write:{id}":
-      {"input": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-embeddings:{id}":
-      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
-      "non-persistent://tg/response/embeddings:{id}", "input": "persistent://tg/flow/chunk-load:{id}",
-      "output": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-rag:{id}":
-      {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request":
+      "non-persistent://tg/request/document-embeddings:{id}", "response": "non-persistent://tg/response/document-embeddings:{id}"},
+      "de-write:{id}": {"input": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-embeddings:{id}": {"embeddings-request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings-response": "non-persistent://tg/response/embeddings:{id}", "input":
+      "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-rag:{id}": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
       "document-embeddings-response": "non-persistent://tg/response/document-embeddings:{id}",
       "embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
       "non-persistent://tg/response/embeddings:{id}", "prompt-request": "non-persistent://tg/request/prompt-rag:{id}",
       "prompt-response": "non-persistent://tg/response/prompt-rag:{id}", "request":
       "non-persistent://tg/request/document-rag:{id}", "response": "non-persistent://tg/response/document-rag:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings:{id}": {"model": "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
       {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
       "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
@@ -1294,40 +1420,41 @@ items:
       "triples": {"request": "non-persistent://tg/request/triples:{id}", "response":
       "non-persistent://tg/response/triples:{id}"}, "triples-store": "persistent://tg/flow/triples-store:{id}"},
       "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
-      "order": 6, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
-      "Chunk size", "order": 5, "type": "chunk-size"}, "llm-model": {"advanced": false,
-      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
-      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
-      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
-      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
-      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
-      3, "type": "llm-temperature"}}, "tags": ["document-rag", "graph-rag", "knowledge-extraction"]},
-      "document-rag+graph-rag+kgcore": {"class": {}, "description": "GraphRAG + DocumentRAG
-      + knowledge core creation", "flow": {"agent-manager:{id}": {"graph-rag-request":
-      "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}",
-      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response":
-      "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
-      "prompt-request": "non-persistent://tg/request/prompt:{id}", "prompt-response":
-      "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["document-rag",
+      "graph-rag", "knowledge-extraction"]}, "document-rag+graph-rag+kgcore": {"class":
+      {}, "description": "GraphRAG + DocumentRAG + knowledge core creation", "flow":
+      {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
+      "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request":
+      "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}",
+      "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
+      "prompt-response": "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
       "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "de-query:{id}": {"request": "non-persistent://tg/request/document-embeddings:{id}",
-      "response": "non-persistent://tg/response/document-embeddings:{id}"}, "de-write:{id}":
-      {"input": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-embeddings:{id}":
-      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
-      "non-persistent://tg/response/embeddings:{id}", "input": "persistent://tg/flow/chunk-load:{id}",
-      "output": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-rag:{id}":
-      {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request":
+      "non-persistent://tg/request/document-embeddings:{id}", "response": "non-persistent://tg/response/document-embeddings:{id}"},
+      "de-write:{id}": {"input": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-embeddings:{id}": {"embeddings-request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings-response": "non-persistent://tg/response/embeddings:{id}", "input":
+      "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-rag:{id}": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
       "document-embeddings-response": "non-persistent://tg/response/document-embeddings:{id}",
       "embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
       "non-persistent://tg/response/embeddings:{id}", "prompt-request": "non-persistent://tg/request/prompt-rag:{id}",
       "prompt-response": "non-persistent://tg/response/prompt-rag:{id}", "request":
       "non-persistent://tg/request/document-rag:{id}", "response": "non-persistent://tg/response/document-rag:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings:{id}": {"model": "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
       {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
       "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
@@ -1391,40 +1518,41 @@ items:
       "triples": {"request": "non-persistent://tg/request/triples:{id}", "response":
       "non-persistent://tg/response/triples:{id}"}, "triples-store": "persistent://tg/flow/triples-store:{id}"},
       "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
-      "order": 6, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
-      "Chunk size", "order": 5, "type": "chunk-size"}, "llm-model": {"advanced": false,
-      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
-      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
-      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
-      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
-      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
-      3, "type": "llm-temperature"}}, "tags": ["document-rag", "graph-rag", "knowledge-extraction"]},
-      "everything": {"class": {}, "description": "GraphRAG, DocumentRAG, structured
-      data + knowledge cores", "flow": {"agent-manager:{id}": {"graph-rag-request":
-      "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}",
-      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response":
-      "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["document-rag",
+      "graph-rag", "knowledge-extraction"]}, "everything": {"class": {}, "description":
+      "GraphRAG, DocumentRAG, structured data + knowledge cores", "flow": {"agent-manager:{id}":
+      {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response":
+      "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}",
+      "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
       "prompt-request": "non-persistent://tg/request/prompt:{id}", "prompt-response":
       "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
       "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "de-query:{id}": {"request": "non-persistent://tg/request/document-embeddings:{id}",
-      "response": "non-persistent://tg/response/document-embeddings:{id}"}, "de-write:{id}":
-      {"input": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-embeddings:{id}":
-      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
-      "non-persistent://tg/response/embeddings:{id}", "input": "persistent://tg/flow/chunk-load:{id}",
-      "output": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-rag:{id}":
-      {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request":
+      "non-persistent://tg/request/document-embeddings:{id}", "response": "non-persistent://tg/response/document-embeddings:{id}"},
+      "de-write:{id}": {"input": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-embeddings:{id}": {"embeddings-request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings-response": "non-persistent://tg/response/embeddings:{id}", "input":
+      "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-rag:{id}": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
       "document-embeddings-response": "non-persistent://tg/response/document-embeddings:{id}",
       "embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
       "non-persistent://tg/response/embeddings:{id}", "prompt-request": "non-persistent://tg/request/prompt-rag:{id}",
       "prompt-response": "non-persistent://tg/response/prompt-rag:{id}", "request":
       "non-persistent://tg/request/document-rag:{id}", "response": "non-persistent://tg/response/document-rag:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings:{id}": {"model": "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
       {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
       "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
@@ -1508,17 +1636,18 @@ items:
       "text-load": "persistent://tg/flow/text-document-load:{id}", "triples": {"request":
       "non-persistent://tg/request/triples:{id}", "response": "non-persistent://tg/response/triples:{id}"},
       "triples-store": "persistent://tg/flow/triples-store:{id}"}, "parameters": {"chunk-overlap":
-      {"advanced": true, "description": "Chunk overlap", "order": 6, "type": "chunk-overlap"},
-      "chunk-size": {"advanced": true, "description": "Chunk size", "order": 5, "type":
-      "chunk-size"}, "llm-model": {"advanced": false, "description": "LLM model",
-      "order": 1, "type": "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by":
-      "llm-model", "description": "LLM model for RAG", "order": 2, "type": "llm-model"},
-      "llm-rag-temperature": {"advanced": true, "description": "LLM temperature for
-      RAG", "order": 4, "type": "llm-temperature"}, "llm-temperature": {"advanced":
-      true, "description": "LLM temperature", "order": 3, "type": "llm-temperature"}},
-      "tags": ["document-rag", "graph-rag", "knowledge-extraction", "structured-data",
-      "kgcore"]}, "graph-rag": {"class": {}, "description": "GraphRAG only", "flow":
-      {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
+      {"advanced": true, "description": "Chunk overlap", "order": 7, "type": "chunk-overlap"},
+      "chunk-size": {"advanced": true, "description": "Chunk size", "order": 6, "type":
+      "chunk-size"}, "embeddings-model": {"advanced": true, "description": "Embeddings
+      model", "order": 5, "type": "embeddings-model"}, "llm-model": {"advanced": false,
+      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
+      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
+      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
+      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
+      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
+      3, "type": "llm-temperature"}}, "tags": ["document-rag", "graph-rag", "knowledge-extraction",
+      "structured-data", "kgcore"]}, "graph-rag": {"class": {}, "description": "GraphRAG
+      only", "flow": {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
       "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request":
       "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}",
       "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
@@ -1527,9 +1656,10 @@ items:
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "embeddings:{id}": {"model":
+      "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
       {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
       "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
@@ -1586,27 +1716,30 @@ items:
       "triples": {"request": "non-persistent://tg/request/triples:{id}", "response":
       "non-persistent://tg/response/triples:{id}"}, "triples-store": "persistent://tg/flow/triples-store:{id}"},
       "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
-      "order": 6, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
-      "Chunk size", "order": 5, "type": "chunk-size"}, "llm-model": {"advanced": false,
-      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
-      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
-      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
-      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
-      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
-      3, "type": "llm-temperature"}}, "tags": ["graph-rag", "knowledge-extraction"]},
-      "graph-rag+agent-extract": {"class": {}, "description": "GraphRAG + agent extract",
-      "flow": {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
-      "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request":
-      "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}",
-      "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
-      "prompt-response": "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["graph-rag",
+      "knowledge-extraction"]}, "graph-rag+agent-extract": {"class": {}, "description":
+      "GraphRAG + agent extract", "flow": {"agent-manager:{id}": {"graph-rag-request":
+      "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}",
+      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response":
+      "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
+      "prompt-request": "non-persistent://tg/request/prompt:{id}", "prompt-response":
+      "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
       "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "embeddings:{id}": {"model":
+      "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
       {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
       "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
@@ -1660,28 +1793,30 @@ items:
       "triples": {"request": "non-persistent://tg/request/triples:{id}", "response":
       "non-persistent://tg/response/triples:{id}"}, "triples-store": "persistent://tg/flow/triples-store:{id}"},
       "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
-      "order": 6, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
-      "Chunk size", "order": 5, "type": "chunk-size"}, "llm-model": {"advanced": false,
-      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
-      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
-      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
-      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
-      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
-      3, "type": "llm-temperature"}}, "tags": ["graph-rag", "knowledge-extraction",
-      "agent-extract"]}, "graph-rag+structured-data": {"class": {}, "description":
-      "GraphRAG + structured data", "flow": {"agent-manager:{id}": {"graph-rag-request":
-      "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}",
-      "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response":
-      "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["graph-rag",
+      "knowledge-extraction", "agent-extract"]}, "graph-rag+structured-data": {"class":
+      {}, "description": "GraphRAG + structured data", "flow": {"agent-manager:{id}":
+      {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response":
+      "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}",
+      "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
       "prompt-request": "non-persistent://tg/request/prompt:{id}", "prompt-response":
       "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
       "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "embeddings:{id}": {"model":
+      "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
       {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
       "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
@@ -1754,28 +1889,107 @@ items:
       "text-load": "persistent://tg/flow/text-document-load:{id}", "triples": {"request":
       "non-persistent://tg/request/triples:{id}", "response": "non-persistent://tg/response/triples:{id}"},
       "triples-store": "persistent://tg/flow/triples-store:{id}"}, "parameters": {"chunk-overlap":
-      {"advanced": true, "description": "Chunk overlap", "order": 6, "type": "chunk-overlap"},
-      "chunk-size": {"advanced": true, "description": "Chunk size", "order": 5, "type":
-      "chunk-size"}, "llm-model": {"advanced": false, "description": "LLM model",
-      "order": 1, "type": "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by":
-      "llm-model", "description": "LLM model for RAG", "order": 2, "type": "llm-model"},
-      "llm-rag-temperature": {"advanced": true, "description": "LLM temperature for
-      RAG", "order": 4, "type": "llm-temperature"}, "llm-temperature": {"advanced":
-      true, "description": "LLM temperature", "order": 3, "type": "llm-temperature"}},
-      "tags": ["graph-rag", "knowledge-extraction", "structured-data"]}, "structured-data":
-      {"class": {}, "description": "Structured data only", "flow": {"agent-manager:{id}":
-      {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}", "graph-rag-response":
-      "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request": "non-persistent://tg/request/mcp-tool:{id}",
-      "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}", "next": "non-persistent://tg/request/agent:{id}",
-      "prompt-request": "non-persistent://tg/request/prompt:{id}", "prompt-response":
-      "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
+      {"advanced": true, "description": "Chunk overlap", "order": 7, "type": "chunk-overlap"},
+      "chunk-size": {"advanced": true, "description": "Chunk size", "order": 6, "type":
+      "chunk-size"}, "embeddings-model": {"advanced": true, "description": "Embeddings
+      model", "order": 5, "type": "embeddings-model"}, "llm-model": {"advanced": false,
+      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
+      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
+      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
+      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
+      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
+      3, "type": "llm-temperature"}}, "tags": ["graph-rag", "knowledge-extraction",
+      "structured-data"]}, "onto-rag": {"class": {}, "description": "Ontology RAG
+      only", "flow": {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
+      "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request":
+      "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}",
+      "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
+      "prompt-response": "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
       "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
       "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
       "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
       "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
-      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"input":
-      "persistent://tg/flow/text-document-load:{id}", "output": "persistent://tg/flow/chunk-load:{id}"},
-      "embeddings:{id}": {"request": "non-persistent://tg/request/embeddings:{id}",
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "embeddings:{id}": {"model":
+      "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
+      "response": "non-persistent://tg/response/embeddings:{id}"}, "ge-query:{id}":
+      {"request": "non-persistent://tg/request/graph-embeddings:{id}", "response":
+      "non-persistent://tg/response/graph-embeddings:{id}"}, "ge-write:{id}": {"input":
+      "persistent://tg/flow/graph-embeddings-store:{id}"}, "graph-embeddings:{id}":
+      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
+      "non-persistent://tg/response/embeddings:{id}", "input": "persistent://tg/flow/entity-contexts-load:{id}",
+      "output": "persistent://tg/flow/graph-embeddings-store:{id}"}, "graph-rag:{id}":
+      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
+      "non-persistent://tg/response/embeddings:{id}", "graph-embeddings-request":
+      "non-persistent://tg/request/graph-embeddings:{id}", "graph-embeddings-response":
+      "non-persistent://tg/response/graph-embeddings:{id}", "prompt-request": "non-persistent://tg/request/prompt-rag:{id}",
+      "prompt-response": "non-persistent://tg/response/prompt-rag:{id}", "request":
+      "non-persistent://tg/request/graph-rag:{id}", "response": "non-persistent://tg/response/graph-rag:{id}",
+      "triples-request": "non-persistent://tg/request/triples:{id}", "triples-response":
+      "non-persistent://tg/response/triples:{id}"}, "kg-extract-ontology:{id}": {"embeddings-request":
+      "non-persistent://tg/request/embeddings:{id}", "embeddings-response": "non-persistent://tg/response/embeddings:{id}",
+      "entity-contexts": "persistent://tg/flow/entity-contexts-load:{id}", "input":
+      "persistent://tg/flow/chunk-load:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
+      "prompt-response": "non-persistent://tg/response/prompt:{id}", "triples": "persistent://tg/flow/triples-store:{id}"},
+      "mcp-tool:{id}": {"request": "non-persistent://tg/request/mcp-tool:{id}", "response":
+      "non-persistent://tg/response/mcp-tool:{id}", "text-completion-request": "non-persistent://tg/request/text-completion:{id}",
+      "text-completion-response": "non-persistent://tg/response/text-completion:{id}"},
+      "metering-rag:{id}": {"input": "non-persistent://tg/response/text-completion-rag:{id}"},
+      "metering:{id}": {"input": "non-persistent://tg/response/text-completion:{id}"},
+      "pdf-decoder:{id}": {"input": "persistent://tg/flow/document-load:{id}", "output":
+      "persistent://tg/flow/text-document-load:{id}"}, "prompt-rag:{id}": {"request":
+      "non-persistent://tg/request/prompt-rag:{id}", "response": "non-persistent://tg/response/prompt-rag:{id}",
+      "text-completion-request": "non-persistent://tg/request/text-completion-rag:{id}",
+      "text-completion-response": "non-persistent://tg/response/text-completion-rag:{id}"},
+      "prompt:{id}": {"request": "non-persistent://tg/request/prompt:{id}", "response":
+      "non-persistent://tg/response/prompt:{id}", "text-completion-request": "non-persistent://tg/request/text-completion:{id}",
+      "text-completion-response": "non-persistent://tg/response/text-completion:{id}"},
+      "text-completion-rag:{id}": {"model": "{llm-rag-model}", "request": "non-persistent://tg/request/text-completion-rag:{id}",
+      "response": "non-persistent://tg/response/text-completion-rag:{id}"}, "text-completion:{id}":
+      {"model": "{llm-model}", "request": "non-persistent://tg/request/text-completion:{id}",
+      "response": "non-persistent://tg/response/text-completion:{id}"}, "triples-query:{id}":
+      {"request": "non-persistent://tg/request/triples:{id}", "response": "non-persistent://tg/response/triples:{id}"},
+      "triples-write:{id}": {"input": "persistent://tg/flow/triples-store:{id}"}},
+      "interfaces": {"agent": {"request": "non-persistent://tg/request/agent:{id}",
+      "response": "non-persistent://tg/response/agent:{id}"}, "document-load": "persistent://tg/flow/document-load:{id}",
+      "embeddings": {"request": "non-persistent://tg/request/embeddings:{id}", "response":
+      "non-persistent://tg/response/embeddings:{id}"}, "entity-contexts-load": "persistent://tg/flow/entity-contexts-load:{id}",
+      "graph-embeddings": {"request": "non-persistent://tg/request/graph-embeddings:{id}",
+      "response": "non-persistent://tg/response/graph-embeddings:{id}"}, "graph-embeddings-store":
+      "persistent://tg/flow/graph-embeddings-store:{id}", "graph-rag": {"request":
+      "non-persistent://tg/request/graph-rag:{id}", "response": "non-persistent://tg/response/graph-rag:{id}"},
+      "mcp-tool": {"request": "non-persistent://tg/request/mcp-tool:{id}", "response":
+      "non-persistent://tg/response/mcp-tool:{id}"}, "prompt": {"request": "non-persistent://tg/request/prompt:{id}",
+      "response": "non-persistent://tg/response/prompt:{id}"}, "text-completion":
+      {"request": "non-persistent://tg/request/text-completion:{id}", "response":
+      "non-persistent://tg/response/text-completion:{id}"}, "text-load": "persistent://tg/flow/text-document-load:{id}",
+      "triples": {"request": "non-persistent://tg/request/triples:{id}", "response":
+      "non-persistent://tg/response/triples:{id}"}, "triples-store": "persistent://tg/flow/triples-store:{id}"},
+      "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["graph-rag",
+      "knowledge-extraction"]}, "structured-data": {"class": {}, "description": "Structured
+      data only", "flow": {"agent-manager:{id}": {"graph-rag-request": "non-persistent://tg/request/graph-rag:{id}",
+      "graph-rag-response": "non-persistent://tg/response/graph-rag:{id}", "mcp-tool-request":
+      "non-persistent://tg/request/mcp-tool:{id}", "mcp-tool-response": "non-persistent://tg/response/mcp-tool:{id}",
+      "next": "non-persistent://tg/request/agent:{id}", "prompt-request": "non-persistent://tg/request/prompt:{id}",
+      "prompt-response": "non-persistent://tg/response/prompt:{id}", "request": "non-persistent://tg/request/agent:{id}",
+      "response": "non-persistent://tg/response/agent:{id}", "structured-query-request":
+      "non-persistent://tg/request/structured-query:{id}", "structured-query-response":
+      "non-persistent://tg/response/structured-query:{id}", "text-completion-request":
+      "non-persistent://tg/request/text-completion:{id}", "text-completion-response":
+      "non-persistent://tg/response/text-completion:{id}"}, "chunker:{id}": {"chunk-overlap":
+      "{chunk-overlap}", "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "embeddings:{id}": {"model":
+      "{embeddings-model}", "request": "non-persistent://tg/request/embeddings:{id}",
       "response": "non-persistent://tg/response/embeddings:{id}"}, "kg-extract-objects:{id}":
       {"entity-contexts": "persistent://tg/flow/entity-contexts-load:{id}", "input":
       "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/objects-store:{id}",
@@ -1826,16 +2040,17 @@ items:
       {"request": "non-persistent://tg/request/text-completion:{id}", "response":
       "non-persistent://tg/response/text-completion:{id}"}, "text-load": "persistent://tg/flow/text-document-load:{id}"},
       "parameters": {"chunk-overlap": {"advanced": true, "description": "Chunk overlap",
-      "order": 6, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
-      "Chunk size", "order": 5, "type": "chunk-size"}, "llm-model": {"advanced": false,
-      "description": "LLM model", "order": 1, "type": "llm-model"}, "llm-rag-model":
-      {"advanced": true, "controlled-by": "llm-model", "description": "LLM model for
-      RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature": {"advanced":
-      true, "description": "LLM temperature for RAG", "order": 4, "type": "llm-temperature"},
-      "llm-temperature": {"advanced": true, "description": "LLM temperature", "order":
-      3, "type": "llm-temperature"}}, "tags": ["knowledge-extraction", "structured-data"]}},
-      "flows": {"default": {"class-name": "everything", "description": "Default processing
-      flow", "interfaces": {"agent": {"request": "non-persistent://tg/request/agent:default",
+      "order": 7, "type": "chunk-overlap"}, "chunk-size": {"advanced": true, "description":
+      "Chunk size", "order": 6, "type": "chunk-size"}, "embeddings-model": {"advanced":
+      true, "description": "Embeddings model", "order": 5, "type": "embeddings-model"},
+      "llm-model": {"advanced": false, "description": "LLM model", "order": 1, "type":
+      "llm-model"}, "llm-rag-model": {"advanced": true, "controlled-by": "llm-model",
+      "description": "LLM model for RAG", "order": 2, "type": "llm-model"}, "llm-rag-temperature":
+      {"advanced": true, "description": "LLM temperature for RAG", "order": 4, "type":
+      "llm-temperature"}, "llm-temperature": {"advanced": true, "description": "LLM
+      temperature", "order": 3, "type": "llm-temperature"}}, "tags": ["knowledge-extraction",
+      "structured-data"]}}, "flows": {"default": {"class-name": "everything", "description":
+      "Default processing flow", "interfaces": {"agent": {"request": "non-persistent://tg/request/agent:default",
       "response": "non-persistent://tg/response/agent:default"}, "document-embeddings":
       {"request": "non-persistent://tg/request/document-embeddings:default", "response":
       "non-persistent://tg/response/document-embeddings:default"}, "document-embeddings-store":
@@ -1862,7 +2077,8 @@ items:
       "non-persistent://tg/response/text-completion:default"}, "text-load": "persistent://tg/flow/text-document-load:default",
       "triples": {"request": "non-persistent://tg/request/triples:default", "response":
       "non-persistent://tg/response/triples:default"}, "triples-store": "persistent://tg/flow/triples-store:default"},
-      "parameters": {"chunk-overlap": "50", "chunk-size": "2000", "llm-model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "parameters": {"chunk-overlap": "50", "chunk-size": "2000", "embeddings-model":
+      "sentence-transformers/all-MiniLM-L6-v2", "llm-model": "Mistral-Small-3.2-24B-Instruct-2506",
       "llm-rag-model": "Mistral-Small-3.2-24B-Instruct-2506", "llm-rag-temperature":
       "0.300", "llm-temperature": "0.300"}}}, "flows-active": {"agent-manager": {"default":
       {"graph-rag-request": "non-persistent://tg/request/graph-rag:default", "graph-rag-response":
@@ -1875,12 +2091,12 @@ items:
       "structured-query-response": "non-persistent://tg/response/structured-query:default",
       "text-completion-request": "non-persistent://tg/request/text-completion:default",
       "text-completion-response": "non-persistent://tg/response/text-completion:default"}},
-      "chunker": {"default": {"input": "persistent://tg/flow/text-document-load:default",
-      "output": "persistent://tg/flow/chunk-load:default"}}, "de-query": {"default":
-      {"request": "non-persistent://tg/request/document-embeddings:default", "response":
-      "non-persistent://tg/response/document-embeddings:default"}}, "de-write": {"default":
-      {"input": "persistent://tg/flow/document-embeddings-store:default"}}, "document-embeddings":
-      {"default": {"embeddings-request": "non-persistent://tg/request/embeddings:default",
+      "chunker": {"default": {"chunk-overlap": "50", "chunk-size": "2000", "input":
+      "persistent://tg/flow/text-document-load:default", "output": "persistent://tg/flow/chunk-load:default"}},
+      "de-query": {"default": {"request": "non-persistent://tg/request/document-embeddings:default",
+      "response": "non-persistent://tg/response/document-embeddings:default"}}, "de-write":
+      {"default": {"input": "persistent://tg/flow/document-embeddings-store:default"}},
+      "document-embeddings": {"default": {"embeddings-request": "non-persistent://tg/request/embeddings:default",
       "embeddings-response": "non-persistent://tg/response/embeddings:default", "input":
       "persistent://tg/flow/chunk-load:default", "output": "persistent://tg/flow/document-embeddings-store:default"}},
       "document-rag": {"default": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:default",
@@ -1889,9 +2105,9 @@ items:
       "non-persistent://tg/response/embeddings:default", "prompt-request": "non-persistent://tg/request/prompt-rag:default",
       "prompt-response": "non-persistent://tg/response/prompt-rag:default", "request":
       "non-persistent://tg/request/document-rag:default", "response": "non-persistent://tg/response/document-rag:default"}},
-      "embeddings": {"default": {"request": "non-persistent://tg/request/embeddings:default",
-      "response": "non-persistent://tg/response/embeddings:default"}}, "ge-query":
-      {"default": {"request": "non-persistent://tg/request/graph-embeddings:default",
+      "embeddings": {"default": {"model": "sentence-transformers/all-MiniLM-L6-v2",
+      "request": "non-persistent://tg/request/embeddings:default", "response": "non-persistent://tg/response/embeddings:default"}},
+      "ge-query": {"default": {"request": "non-persistent://tg/request/graph-embeddings:default",
       "response": "non-persistent://tg/response/graph-embeddings:default"}}, "ge-write":
       {"default": {"input": "persistent://tg/flow/graph-embeddings-store:default"}},
       "graph-embeddings": {"default": {"embeddings-request": "non-persistent://tg/request/embeddings:default",
@@ -1975,25 +2191,54 @@ items:
       50 .. 100", "max": 8000, "min": 0, "placeholder": 50, "required": true, "type":
       "integer"}, "chunk-size": {"default": 2000, "description": "Chunk size", "helper":
       "An integer, usually 2000 .. 8000", "max": 32768, "min": 0, "placeholder": 2000,
-      "required": true, "type": "integer"}, "llm-model": {"default": "Mistral-Small-3.2-24B-Instruct-2506",
-      "description": "LLM model to use", "enum": [{"description": "Mistral small 3.2
-      24b instruct (2506)", "id": "Mistral-Small-3.2-24B-Instruct-2506"}], "required":
-      true, "type": "string"}, "llm-temperature": {"default": 0.3, "description":
-      "LLM temperature", "helper": "A floating point number between 0 and 1", "max":
-      10, "min": 0, "placeholder": 0.3, "required": true, "type": "float"}}, "prompt":
-      {"system": "You are a helpful assistant.", "template-index": ["agent-kg-extract",
-      "agent-react", "diagnose-csv", "diagnose-json", "diagnose-structured-data",
-      "diagnose-xml", "document-prompt", "extract-definitions", "extract-relationships",
-      "extract-rows", "extract-topics", "graphql-generation", "kg-prompt", "question",
-      "schema-selection"], "template.agent-kg-extract": {"prompt": "Analyze the following
-      text and extract both entity definitions and relationships. Return the results
-      as JSON with ''definitions'' and ''relationships'' arrays.\n\nFor definitions,
-      extract entities and their explanations or descriptions.\nFor relationships,
-      extract subject-predicate-object triples where subjects and objects are entities,
-      and predicates are relationship types.\n\nText: {{text}}\n\nReturn JSON only,
-      no other text. Use this exact format:\n{\n  \"definitions\": [\n    {\n      \"entity\":
-      \"entity_name\",\n      \"definition\": \"definition_text\"\n    }\n  ],\n  \"relationships\":
-      [\n    {\n      \"subject\": \"subject_entity\",\n      \"predicate\": \"relationship_type\",\n      \"object\":
+      "required": true, "type": "integer"}, "embeddings-model": {"default": "sentence-transformers/all-MiniLM-L6-v2",
+      "description": "Embeddings model to use", "enum": [{"description": "all-MiniLM-L6-v2",
+      "id": "sentence-transformers/all-MiniLM-L6-v2"}, {"description": "bge-small-en-v1.5",
+      "id": "BAAI/bge-small-en-v1.5"}, {"description": "bge-small-zh-v1.5", "id":
+      "BAAI/bge-small-zh-v1.5"}, {"description": "snowflake-arctic-embed-xs", "id":
+      "snowflake/snowflake-arctic-embed-xs"}, {"description": "jina-embeddings-v2-small-en",
+      "id": "jinaai/jina-embeddings-v2-small-en"}, {"description": "nomic-embed-text-v1.5-Q",
+      "id": "nomic-ai/nomic-embed-text-v1.5-Q"}, {"description": "snowflake-arctic-embed-s",
+      "id": "snowflake/snowflake-arctic-embed-s"}, {"description": "bge-small-en",
+      "id": "BAAI/bge-small-en"}, {"description": "bge-base-en-v1.5", "id": "BAAI/bge-base-en-v1.5"},
+      {"description": "paraphrase-multilingual-MiniLM-L12-v2", "id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"},
+      {"description": "clip-ViT-B-32-text", "id": "Qdrant/clip-ViT-B-32-text"}, {"description":
+      "jina-embeddings-v2-base-de", "id": "jinaai/jina-embeddings-v2-base-de"}, {"description":
+      "bge-base-en", "id": "BAAI/bge-base-en"}, {"description": "snowflake-arctic-embed-m",
+      "id": "snowflake/snowflake-arctic-embed-m"}, {"description": "gte-base", "id":
+      "thenlper/gte-base"}, {"description": "jina-embeddings-v2-base-en", "id": "jinaai/jina-embeddings-v2-base-en"},
+      {"description": "nomic-embed-text-v1", "id": "nomic-ai/nomic-embed-text-v1"},
+      {"description": "nomic-embed-text-v1.5", "id": "nomic-ai/nomic-embed-text-v1.5"},
+      {"description": "snowflake-arctic-embed-m-long", "id": "snowflake/snowflake-arctic-embed-m-long"},
+      {"description": "jina-clip-v1", "id": "jinaai/jina-clip-v1"}, {"description":
+      "mxbai-embed-large-v1", "id": "mixedbread-ai/mxbai-embed-large-v1"}, {"description":
+      "jina-embeddings-v2-base-es", "id": "jinaai/jina-embeddings-v2-base-es"}, {"description":
+      "jina-embeddings-v2-base-code", "id": "jinaai/jina-embeddings-v2-base-code"},
+      {"description": "jina-embeddings-v2-base-zh", "id": "jinaai/jina-embeddings-v2-base-zh"},
+      {"description": "paraphrase-multilingual-mpnet-base-v2", "id": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"},
+      {"description": "snowflake-arctic-embed-l", "id": "snowflake/snowflake-arctic-embed-l"},
+      {"description": "bge-large-en-v1.5", "id": "BAAI/bge-large-en-v1.5"}, {"description":
+      "gte-large", "id": "thenlper/gte-large"}, {"description": "multilingual-e5-large",
+      "id": "intfloat/multilingual-e5-large"}], "required": true, "type": "string"},
+      "llm-model": {"default": "Mistral-Small-3.2-24B-Instruct-2506", "description":
+      "LLM model to use", "enum": [{"description": "Mistral small 3.2 24b instruct
+      (2506)", "id": "Mistral-Small-3.2-24B-Instruct-2506"}], "required": true, "type":
+      "string"}, "llm-temperature": {"default": 0.3, "description": "LLM temperature",
+      "helper": "A floating point number between 0 and 1", "max": 10, "min": 0, "placeholder":
+      0.3, "required": true, "type": "float"}}, "prompt": {"system": "You are a helpful
+      assistant.", "template-index": ["agent-kg-extract", "agent-react", "diagnose-csv",
+      "diagnose-json", "diagnose-structured-data", "diagnose-xml", "document-prompt",
+      "extract-definitions", "extract-relationships", "extract-rows", "extract-topics",
+      "extract-with-ontologies", "graphql-generation", "kg-prompt", "question", "schema-selection"],
+      "template.agent-kg-extract": {"prompt": "Analyze the following text and extract
+      both entity definitions and relationships. Return the results as JSON with ''definitions''
+      and ''relationships'' arrays.\n\nFor definitions, extract entities and their
+      explanations or descriptions.\nFor relationships, extract subject-predicate-object
+      triples where subjects and objects are entities, and predicates are relationship
+      types.\n\nText: {{text}}\n\nReturn JSON only, no other text. Use this exact
+      format:\n{\n  \"definitions\": [\n    {\n      \"entity\": \"entity_name\",\n      \"definition\":
+      \"definition_text\"\n    }\n  ],\n  \"relationships\": [\n    {\n      \"subject\":
+      \"subject_entity\",\n      \"predicate\": \"relationship_type\",\n      \"object\":
       \"object_entity_or_literal\",\n      \"object-entity\": true\n    }\n  ]\n}\n",
       "response-type": "json", "schema": {"properties": {"definitions": {"items":
       {"properties": {"definition": {"type": "string"}, "entity": {"type": "string"}},
@@ -2624,7 +2869,7 @@ items:
       "response-type": "text"}, "template.extract-definitions": {"prompt": "<instructions>\nStudy
       the following text and derive definitions for any discovered entities.\nDo not
       provide definitions for entities whose definitions are incomplete\nor unknown.\nOutput
-      relationships in JSON format as an arary of objects with fields:\n- entity:
+      relationships in JSON format as an array of objects with fields:\n- entity:
       the name of the entity\n- definition: English text which defines the entity\n</instructions>\n\n<text>\n{{text}}\n</text>\n\n<requirements>\nYou
       will respond only with raw JSON format data. Do not provide\nexplanations. Do
       not use special characters in the abstract text. The\nabstract will be written
@@ -2635,7 +2880,7 @@ items:
       "object"}, "type": "array"}}, "template.extract-relationships": {"prompt": "<instructions>\nStudy
       the following text and derive entity relationships.  For each\nrelationship,
       derive the subject, predicate and object of the relationship.\nOutput relationships
-      in JSON format as an arary of objects with fields:\n- subject: the subject of
+      in JSON format as an array of objects with fields:\n- subject: the subject of
       the relationship\n- predicate: the predicate\n- object: the object of the relationship\n-
       object-entity: false if the object is a simple data type: name, value or date.  true
       if it is an entity.\n</instructions>\n\n<text>\n{{text}}\n</text>\n\n<requirements>\nYou
@@ -2664,16 +2909,46 @@ items:
       string, \"definition\": string}]\n```\n\n- Do not write any additional text
       or explanations.", "response-type": "json", "schema": {"items": {"properties":
       {"definition": {"type": "string"}, "topic": {"type": "string"}}, "required":
-      ["topic", "definition"], "type": "object"}, "type": "array"}}, "template.graphql-generation":
+      ["topic", "definition"], "type": "object"}, "type": "array"}}, "template.extract-with-ontologies":
+      {"prompt": "You are a knowledge extraction expert. Extract structured triples
+      from text using ONLY the provided ontology elements.\n\n## Ontology Classes:\n\n{%
+      for class_id, class_def in classes.items() %}\n- **{{class_id}}**{% if class_def.subclass_of
+      %} (subclass of {{class_def.subclass_of}}){% endif %}{% if class_def.comment
+      %}: {{class_def.comment}}{% endif %}\n{% endfor %}\n\n## Object Properties (connect
+      entities):\n\n{% for prop_id, prop_def in object_properties.items() %}\n- **{{prop_id}}**{%
+      if prop_def.domain and prop_def.range %} ({{prop_def.domain}} \u2192 {{prop_def.range}}){%
+      endif %}{% if prop_def.comment %}: {{prop_def.comment}}{% endif %}\n{% endfor
+      %}\n\n## Datatype Properties (entity attributes):\n\n{% for prop_id, prop_def
+      in datatype_properties.items() %}\n- **{{prop_id}}**{% if prop_def.domain and
+      prop_def.range %} ({{prop_def.domain}} \u2192 {{prop_def.range}}){% endif %}{%
+      if prop_def.comment %}: {{prop_def.comment}}{% endif %}\n{% endfor %}\n\n##
+      Text to Analyze:\n\n{{text}}\n\n## Extraction Rules:\n\n1. Only use classes
+      defined above for entity types\n2. Only use properties defined above for relationships
+      and attributes\n3. Respect domain and range constraints where specified\n4.
+      For class instances, use `rdf:type` as the predicate\n5. Include `rdfs:label`
+      for new entities to provide human-readable names\n6. Extract all relevant triples
+      that can be inferred from the text\n7. Use entity URIs or meaningful identifiers
+      as subjects/objects\n\n## Output Format:\n\nReturn ONLY a valid JSON array (no
+      markdown, no code blocks) containing objects with these fields:\n- \"subject\":
+      the subject entity (URI or identifier)\n- \"predicate\": the property (from
+      ontology or rdf:type/rdfs:label)\n- \"object\": the object entity or literal
+      value\n\nImportant: Return raw JSON only, with no markdown formatting, no code
+      blocks, and no backticks.\n\n## Example Output:\n\n[\n  {\"subject\": \"recipe:cornish-pasty\",
+      \"predicate\": \"rdf:type\", \"object\": \"Recipe\"},\n  {\"subject\": \"recipe:cornish-pasty\",
+      \"predicate\": \"rdfs:label\", \"object\": \"Cornish Pasty\"},\n  {\"subject\":
+      \"recipe:cornish-pasty\", \"predicate\": \"has_ingredient\", \"object\": \"ingredient:flour\"},\n  {\"subject\":
+      \"ingredient:flour\", \"predicate\": \"rdf:type\", \"object\": \"Ingredient\"},\n  {\"subject\":
+      \"ingredient:flour\", \"predicate\": \"rdfs:label\", \"object\": \"plain flour\"}\n]\n\nNow
+      extract triples from the text above.\n", "response-type": "json"}, "template.graphql-generation":
       {"prompt": "You are a GraphQL query generation expert. Given a natural language
-      question\nand provided database schemas, generate a valid GraphQL query embedded
-      in\nvalid JSON schema.\n\n## Question:\n{{ question }}\n\n## Provided Schemas:\n{%
-      for schema in schemas %}\n**{{ schema.name }}**: {{ schema.description }}\nFields:\n{%
-      for field in schema.fields %}\n- {{ field.name }} ({{ field.type }}){% if field.description
-      %}: {{ field.description }}{% endif\n%}{% if field.primary_key %} [PRIMARY KEY]{%
-      endif %}{% if field.required %} [REQUIRED]{% endif \n%}{% if field.indexed %}
-      [INDEXED]{% endif %}{% if field.enum_values %} [OPTIONS: {{\nfield.enum_values|join('',
-      '') }}]{% endif %}\n{% endfor %}\n\n{% endfor %}\n\n## GraphQL Query Rules:\n1.
+      question and provided database schemas, generate a valid GraphQL query embedded
+      in valid JSON.\n\n## Question:\n{{ question }}\n\n## Provided Schemas:\n{% for
+      schema in schemas %}\n**{{ schema.name }}**: {{ schema.description }}\nFields:\n{%
+      for field in schema.fields %}- {{ field.name }} ({{ field.type }}){% if field.description
+      %}: {{ field.description }}{% endif %}{% if field.primary_key %} [PRIMARY KEY]{%
+      endif %}{% if field.required %} [REQUIRED]{% endif %}{% if field.indexed %}
+      [INDEXED]{% endif %}{% if field.enum_values %} [OPTIONS: {{ field.enum_values|join('',
+      '') }}]{% endif %}\n{% endfor %}\n{% endfor %}\n\n## GraphQL Query Rules:\n1.
       Use the schema names as GraphQL query fields (e.g., `customers`, `orders`)\n2.
       Apply filters using the `where` parameter with nested filter objects\n3. Available
       filter operators per field type:\n   - String fields: `eq`, `contains`, `startsWith`,
@@ -2681,38 +2956,40 @@ items:
       `lt`, `lte`, `in`, `not`, `not_in`\n4. Use `order_by` for sorting (field name
       as string)\n5. Use `direction` for sort direction: `ASC` or `DESC`\n6. Use `limit`
       to restrict number of results\n7. Select specific fields in the query body\n\n##
-      Response Instructions:\n\n1. Analyze the question to identify:\n  - What data
-      to retrieve (which fields to select)\n  - What filters to apply (where conditions)\n  -
-      What sorting is needed (order_by, direction)\n  - How many results (limit)\n2.
-      Generate a GraphQL query that:\n  - Uses only the provided schema names and
-      field names\n  - Applies appropriate filters based on the question\n  - Selects
-      relevant fields for the response\n  - Includes reasonable limits (default 100
-      if not specified)\n3. If variables are needed, include them in the response\n\n###
-      Response Format:\n\nReturn a JSON object with:\n- \"query\": the GraphQL query
-      string\n- \"variables\": object with any GraphQL variables (empty object if
-      none)\n- \"confidence\": float between 0.0-1.0 indicating confidence in the
-      query\n\n### Example Responses:\n\nExample:\n**Question**: \"Show me customers
-      from California\"\n{\n  \"query\": \"query { customers(where: {state: {eq: \\\"California\\\"}},
-      limit: 100) { customer_id name email state} }\",\n  \"variables\": {},\n  \"confidence\":
-      0.92\n}\n\nExample:\n**Question**: \"Top 10 products by price\"\n{\n  \"query\":
-      \"query { products(order_by: \\\"price\\\", direction: DESC, limit: 10) { product_id
-      name price category } }\",\n  \"variables\": {},\n  \"confidence\": 0.88\n}\n\nExample:\n**Question**:
-      \"Recent orders over $100\"\n{\n  \"query\": \"query { orders( where: { total_amount:
-      {gt: 100}, order_date: {gte: \\\"2024-01-01\\\"} }, order_by: \\\"order_date\\\",
-      direction: DESC, limit: 50) { order_id customer_id total_amount order_date status
-      } }\",\n  \"variables\": {},\n  \"confidence\": 0.96\n}\n\n}\n\n", "response-type":
-      "json", "schema": {"additionalProperties": false, "properties": {"confidence":
-      {"description": "Float between 0.0-1.0 indicating confidence in the generated
-      query", "maximum": 1, "minimum": 0, "type": "number"}, "query": {"description":
-      "The GraphQL query string generated to answer the question", "type": "string"},
-      "variables": {"additionalProperties": true, "description": "Object containing
-      any GraphQL variables needed for the query", "type": "object"}}, "required":
-      ["query", "variables", "confidence"], "type": "object"}}, "template.kg-prompt":
-      {"prompt": "Study the following set of knowledge statements. The statements
-      are written in Cypher format that has been extracted from a knowledge graph.
-      Use only the provided set of knowledge statements in your response. Do not speculate
-      if the answer is not found in the provided set of knowledge statements.\n\nHere''s
-      the knowledge statements:\n{% for edge in knowledge %}({{edge.s}})-[{{edge.p}}]->({{edge.o}})\n{%endfor%}\n\nUse
+      Task Instructions:\n1. Analyze the question to identify:\n   - What data to
+      retrieve (which fields to select)\n   - What filters to apply (where conditions)\n   -
+      What sorting is needed (order_by, direction)\n   - How many results (limit)\n\n2.
+      Generate a GraphQL query that:\n   - Uses only the provided schema names and
+      field names\n   - Applies appropriate filters based on the question\n   - Selects
+      relevant fields for the response\n   - Includes reasonable limits (default 100
+      if not specified)\n\n3. If variables are needed, include them in the response\n\n##
+      Output Format:\nReturn ONLY a valid JSON object (no markdown, no code blocks)
+      with these fields:\n- \"query\": the GraphQL query string\n- \"variables\":
+      object with any GraphQL variables (empty object if none)\n- \"confidence\":
+      float between 0.0-1.0 indicating confidence in the query\n\nImportant: Return
+      raw JSON only, with no markdown formatting, no code blocks, and no backticks.\n\n##
+      Examples:\n\nQuestion: \"Show me customers from California\"\n{\"query\": \"query
+      { customers(where: {state: {eq: \\\"California\\\"}}, limit: 100) { customer_id
+      name email state } }\", \"variables\": {}, \"confidence\": 0.92}\n\nQuestion:
+      \"Top 10 products by price\"\n{\"query\": \"query { products(order_by: \\\"price\\\",
+      direction: DESC, limit: 10) { product_id name price category } }\", \"variables\":
+      {}, \"confidence\": 0.88}\n\nQuestion: \"Recent orders over $100\"\n{\"query\":
+      \"query { orders(where: {total_amount: {gt: 100}, order_date: {gte: \\\"2024-01-01\\\"}},
+      order_by: \\\"order_date\\\", direction: DESC, limit: 50) { order_id customer_id
+      total_amount order_date status } }\", \"variables\": {}, \"confidence\": 0.96}\n\nNow
+      generate the GraphQL query for the question above.\n", "response-type": "json",
+      "schema": {"additionalProperties": false, "properties": {"confidence": {"description":
+      "Float between 0.0-1.0 indicating confidence in the generated query", "maximum":
+      1, "minimum": 0, "type": "number"}, "query": {"description": "The GraphQL query
+      string generated to answer the question", "type": "string"}, "variables": {"additionalProperties":
+      true, "description": "Object containing any GraphQL variables needed for the
+      query", "type": "object"}}, "required": ["query", "variables", "confidence"],
+      "type": "object"}}, "template.kg-prompt": {"prompt": "Study the following set
+      of knowledge statements. The statements are written in Cypher format that has
+      been extracted from a knowledge graph. Use only the provided set of knowledge
+      statements in your response. Do not speculate if the answer is not found in
+      the provided set of knowledge statements.\n\nHere''s the knowledge statements:\n{%
+      for edge in knowledge %}({{edge.s}})-[{{edge.p}}]->({{edge.o}})\n{%endfor%}\n\nUse
       only the provided knowledge statements to respond to the following:\n{{query}}\n",
       "response-type": "text"}, "template.question": {"prompt": "{{question}}"}, "template.schema-selection":
       {"prompt": "You are a database schema selection expert. Given a natural language
@@ -2799,7 +3076,7 @@ items:
           - http://pulsar:8080
           - --config-file
           - /trustgraph/config.json
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: init-trustgraph
           resources:
             limits:
@@ -2844,7 +3121,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: kg-extract-agent
           resources:
             limits:
@@ -2895,7 +3172,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: kg-extract-definitions
           resources:
             limits:
@@ -2946,7 +3223,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: kg-extract-objects
           resources:
             limits:
@@ -2975,6 +3252,57 @@ items:
   kind: Deployment
   metadata:
     labels:
+      app: kg-extract-ontology
+    name: kg-extract-ontology
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: kg-extract-ontology
+    template:
+      metadata:
+        labels:
+          app: kg-extract-ontology
+      spec:
+        containers:
+        - command:
+          - kg-extract-ontology
+          - -p
+          - pulsar://pulsar:6650
+          - --concurrency
+          - '1'
+          - --log-level
+          - DEBUG
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
+          name: kg-extract-ontology
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 300M
+            requests:
+              cpu: '0.1'
+              memory: 300M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: kg-extract-ontology
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: kg-extract-ontology
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
       app: kg-extract-relationships
     name: kg-extract-relationships
     namespace: trustgraph
@@ -2997,7 +3325,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: kg-extract-relationships
           resources:
             limits:
@@ -3046,7 +3374,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: kg-manager
           resources:
             limits:
@@ -3095,7 +3423,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: kg-store
           resources:
             limits:
@@ -3144,7 +3472,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: librarian
           resources:
             limits:
@@ -3197,7 +3525,7 @@ items:
               secretKeyRef:
                 key: mcp-server-secret
                 name: mcp-server-secret
-          image: docker.io/trustgraph/trustgraph-mcp:1.4.19
+          image: docker.io/trustgraph/trustgraph-mcp:1.5.7
           name: mcp-server
           ports:
           - containerPort: 8000
@@ -3249,7 +3577,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: mcp-tool
           resources:
             limits:
@@ -3298,7 +3626,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: metering
           resources:
             limits:
@@ -3349,7 +3677,7 @@ items:
           - metering-rag
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: metering-rag
           resources:
             limits:
@@ -3478,7 +3806,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: nlp-query
           resources:
             limits:
@@ -3527,7 +3855,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: pdf-decoder
           resources:
             limits:
@@ -3581,29 +3909,30 @@ items:
       \ 'kg-extract-objects'\n    scrape_interval: 5s\n    static_configs:\n     \
       \ - targets:\n        - 'kg-extract-objects:8000'\n\n  - job_name: 'kg-extract-relationships'\n\
       \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-extract-relationships:8000'\n\
-      \n  - job_name: 'kg-manager'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'kg-manager:8000'\n\n  - job_name: 'kg-store'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-store:8000'\n\
-      \n  - job_name: 'librarian'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'librarian:8000'\n\n  - job_name: 'mcp-server'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'mcp-server:8000'\n\
-      \n  - job_name: 'mcp-tool'\n    scrape_interval: 5s\n    static_configs:\n \
-      \     - targets:\n        - 'mcp-tool:8000'\n\n  - job_name: 'metering'\n  \
-      \  scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'metering:8000'\n\
-      \n  - job_name: 'metering-rag'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'metering-rag:8000'\n\n  - job_name: 'nlp-query'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'nlp-query:8000'\n\
-      \n  - job_name: 'pdf-decoder'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'pdf-decoder:8000'\n\n  - job_name: 'prompt'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'prompt:8000'\n\
-      \n  - job_name: 'prompt-rag'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'prompt-rag:8000'\n\n  - job_name: 'query-doc-embeddings'\n\
-      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'query-doc-embeddings:8000'\n\
-      \n  - job_name: 'query-graph-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
-      \      - targets:\n        - 'query-graph-embeddings:8000'\n\n  - job_name:\
-      \ 'query-objects'\n    scrape_interval: 5s\n    static_configs:\n      - targets:\n\
-      \        - 'query-objects:8000'\n\n  - job_name: 'query-triples'\n    scrape_interval:\
-      \ 5s\n    static_configs:\n      - targets:\n        - 'query-triples:8000'\n\
+      \n  - job_name: 'kg-extract-ontology'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'kg-extract-ontology:8000'\n\n  - job_name: 'kg-manager'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'kg-manager:8000'\n\
+      \n  - job_name: 'kg-store'\n    scrape_interval: 5s\n    static_configs:\n \
+      \     - targets:\n        - 'kg-store:8000'\n\n  - job_name: 'librarian'\n \
+      \   scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'librarian:8000'\n\
+      \n  - job_name: 'mcp-server'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'mcp-server:8000'\n\n  - job_name: 'mcp-tool'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'mcp-tool:8000'\n\
+      \n  - job_name: 'metering'\n    scrape_interval: 5s\n    static_configs:\n \
+      \     - targets:\n        - 'metering:8000'\n\n  - job_name: 'metering-rag'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'metering-rag:8000'\n\
+      \n  - job_name: 'nlp-query'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'nlp-query:8000'\n\n  - job_name: 'pdf-decoder'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'pdf-decoder:8000'\n\
+      \n  - job_name: 'prompt'\n    scrape_interval: 5s\n    static_configs:\n   \
+      \   - targets:\n        - 'prompt:8000'\n\n  - job_name: 'prompt-rag'\n    scrape_interval:\
+      \ 5s\n    static_configs:\n      - targets:\n        - 'prompt-rag:8000'\n\n\
+      \  - job_name: 'query-doc-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'query-doc-embeddings:8000'\n\n  - job_name: 'query-graph-embeddings'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'query-graph-embeddings:8000'\n\
+      \n  - job_name: 'query-objects'\n    scrape_interval: 5s\n    static_configs:\n\
+      \      - targets:\n        - 'query-objects:8000'\n\n  - job_name: 'query-triples'\n\
+      \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'query-triples:8000'\n\
       \n  - job_name: 'store-doc-embeddings'\n    scrape_interval: 5s\n    static_configs:\n\
       \      - targets:\n        - 'store-doc-embeddings:8000'\n\n  - job_name: 'store-graph-embeddings'\n\
       \    scrape_interval: 5s\n    static_configs:\n      - targets:\n        - 'store-graph-embeddings:8000'\n\
@@ -3717,7 +4046,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: prompt
           resources:
             limits:
@@ -3770,7 +4099,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: prompt-rag
           resources:
             limits:
@@ -4169,7 +4498,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: query-doc-embeddings
           resources:
             limits:
@@ -4220,7 +4549,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: query-graph-embeddings
           resources:
             limits:
@@ -4271,7 +4600,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: query-objects
           resources:
             limits:
@@ -4322,7 +4651,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: query-triples
           resources:
             limits:
@@ -4373,7 +4702,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: store-doc-embeddings
           resources:
             limits:
@@ -4424,7 +4753,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: store-graph-embeddings
           resources:
             limits:
@@ -4475,7 +4804,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: store-objects
           resources:
             limits:
@@ -4526,7 +4855,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: store-triples
           resources:
             limits:
@@ -4575,7 +4904,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: structured-diag
           resources:
             limits:
@@ -4624,7 +4953,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: structured-query
           resources:
             limits:
@@ -4688,7 +5017,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: text-completion
           resources:
             limits:
@@ -4754,7 +5083,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:1.4.19
+          image: docker.io/trustgraph/trustgraph-flow:1.5.7
           name: text-completion-rag
           resources:
             limits:
@@ -4797,7 +5126,7 @@ items:
           app: workbench-ui
       spec:
         containers:
-        - image: docker.io/trustgraph/workbench-ui:1.2.4
+        - image: docker.io/trustgraph/workbench-ui:1.3.7
           name: workbench-ui
           ports:
           - containerPort: 8888
