@@ -227,8 +227,8 @@ AI endpoint hostname specified in the Pulumi config.
 ```
 python3 -m venv env
 . env/bin/activate
-pip install --upgrade git+https://github.com/trustgraph-ai/trustgraph-templates@5e839db05e9e278374d510c9cdd0c02ade12aabd
-tg-configurator -t 1.4 -v 1.4.19 --platform ovh-k8s -R > resources.yaml
+pip install --upgrade git+https://github.com/trustgraph-ai/trustgraph-templates@master
+tg-configurator -t 1.5 -v 1.5.7 --platform ovh-k8s -R > resources.yaml
 ```
 
 ## Additional Resources
