@@ -8,11 +8,11 @@
         "parameters": {}
     },
     {
-        "name": "pulsar",
+        "name": "vector-store-qdrant",
         "parameters": {}
     },
     {
-        "name": "vector-store-qdrant",
+        "name": "pulsar",
         "parameters": {}
     },
     {
@@ -39,17 +39,19 @@
     {
         "name": "openai",
         "parameters": {
-            "temperature": 0.3,
             "max-output-tokens": 4096,
-            "model": "Mistral-Nemo-Instruct-2407"
-        }
-    },
-    {
-        "name": "openai-rag",
-        "parameters": {
-            "temperature": 0.3,
-            "max-output-tokens": 4096,
-            "model": "Mistral-Nemo-Instruct-2407"
+	    "models": {
+		"type": "string",
+		"description": "LLM model to use",
+		"default": "Mistral-Small-3.2-24B-Instruct-2506",
+		"enum": [
+		    {
+			id: "Mistral-Small-3.2-24B-Instruct-2506",
+			description: "Mistral small 3.2 24b instruct (2506)"
+		    },
+		],
+		"required": true
+	    }
         }
     }
 ]
