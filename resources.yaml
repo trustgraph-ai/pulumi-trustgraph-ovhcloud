@@ -56,7 +56,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: agent-manager
           resources:
             limits:
@@ -115,7 +115,7 @@ items:
               secretKeyRef:
                 key: gateway-secret
                 name: gateway-secret
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: api-gateway
           ports:
           - containerPort: 8088
@@ -123,10 +123,10 @@ items:
           resources:
             limits:
               cpu: '0.5'
-              memory: 256M
+              memory: 512M
             requests:
               cpu: '0.1'
-              memory: 256M
+              memory: 512M
           securityContext:
             runAsGroup: 0
             runAsUser: 0
@@ -241,7 +241,7 @@ items:
           - '100'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: chunker
           resources:
             limits:
@@ -290,7 +290,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: config-svc
           resources:
             limits:
@@ -385,7 +385,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: document-embeddings
           resources:
             limits:
@@ -436,7 +436,7 @@ items:
           - '20'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: document-rag
           resources:
             limits:
@@ -487,7 +487,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: embeddings
           resources:
             limits:
@@ -512,6 +512,283 @@ items:
       targetPort: 8000
     selector:
       app: embeddings
+- apiVersion: v1
+  data:
+    garage.toml: 'metadata_dir = "/var/lib/garage/meta"
+
+      data_dir = "/var/lib/garage/data"
+
+
+      db_engine = "lmdb"
+
+
+      replication_factor = 1
+
+
+      compression_level = 1
+
+
+      rpc_bind_addr = "[::]:3901"
+
+      rpc_public_addr = "[::]:3901"
+
+      rpc_secret = "bbba746a9e289bad64a9e7a36a4299dac8d6e0b8cc2a6c2937fe756df4492008"
+
+
+      [s3_api]
+
+      s3_region = "garage"
+
+      api_bind_addr = "[::]:3900"
+
+      root_domain = ".s3.garage.local"
+
+
+      [s3_web]
+
+      bind_addr = "[::]:3902"
+
+      root_domain = ".web.garage.local"
+
+      index = "index.html"
+
+
+      [k2v_api]
+
+      api_bind_addr = "[::]:3904"
+
+
+      [admin]
+
+      api_bind_addr = "[::]:3903"
+
+      admin_token = "batts-rockhearted-unpartially"
+
+      '
+  kind: ConfigMap
+  metadata:
+    name: garage-cfg
+    namespace: trustgraph
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: garage-meta
+    namespace: trustgraph
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: tg
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: garage-data
+    namespace: trustgraph
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5G
+    storageClassName: tg
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: garage
+    name: garage
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: garage
+    template:
+      metadata:
+        labels:
+          app: garage
+      spec:
+        containers:
+        - command:
+          - /garage
+          - -c
+          - /etc/garage/garage.toml
+          - server
+          env:
+          - name: RUST_LOG
+            value: garage=info
+          image: docker.io/dxflrs/garage:v2.1.0
+          name: garage
+          ports:
+          - containerPort: 3900
+            hostPort: 3900
+          - containerPort: 3901
+            hostPort: 3901
+          - containerPort: 3902
+            hostPort: 3902
+          - containerPort: 3903
+            hostPort: 3903
+          - containerPort: 3904
+            hostPort: 3904
+          resources:
+            limits:
+              cpu: '1.0'
+              memory: 512M
+            requests:
+              cpu: '0.5'
+              memory: 512M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+          - mountPath: /etc/garage/
+            name: garage-cfg
+          - mountPath: /var/lib/garage/meta
+            name: garage-meta
+          - mountPath: /var/lib/garage/data
+            name: garage-data
+        volumes:
+        - configMap:
+            name: garage-cfg
+          name: garage-cfg
+        - name: garage-meta
+          persistentVolumeClaim:
+            claimName: garage-meta
+        - name: garage-data
+          persistentVolumeClaim:
+            claimName: garage-data
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: garage-init
+    name: garage-init
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: garage-init
+    template:
+      metadata:
+        labels:
+          app: garage-init
+      spec:
+        containers:
+        - command:
+          - sh
+          - -c
+          - "set -e\n\n# Install required tools\necho \"Installing curl, jq and downloading\
+            \ garage CLI...\"\napk add --no-cache curl jq\n\n# Download garage binary\
+            \ (v2.1.0) for remote management\ncurl -fsSL \"https://garagehq.deuxfleurs.fr/_releases/v2.1.0/x86_64-unknown-linux-musl/garage\"\
+            \ \\\n    -o /usr/local/bin/garage\nchmod +x /usr/local/bin/garage\n\n\
+            echo \"Waiting for Garage daemon to be ready...\"\nMAX_ATTEMPTS=60\nATTEMPT=0\n\
+            # Wait for /health to respond (even 503 is fine - means daemon is up)\n\
+            until curl -s http://garage:3903/health >/dev/null 2>&1; do\n    ATTEMPT=$((ATTEMPT+1))\n\
+            \    if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then\n        echo \"ERROR: Garage\
+            \ failed to become ready after ${MAX_ATTEMPTS} attempts\"\n        exit\
+            \ 1\n    fi\n    echo \"Attempt ${ATTEMPT}/${MAX_ATTEMPTS}: Garage not\
+            \ ready, retrying in 2s...\"\n    sleep 2\ndone\necho \"Garage daemon\
+            \ is ready.\"\n\n# Get the node ID via v2 Admin API\necho \"Getting Garage\
+            \ node ID via Admin API...\"\ncurl -s -H \"Authorization: Bearer ${GARAGE_ADMIN_TOKEN}\"\
+            \ \\\n    \"http://garage:3903/v2/GetNodeInfo?node=self\" > /tmp/garage-node-info.json\n\
+            \n# Extract node ID from response (the key in success map is the node\
+            \ ID)\nNODE_ID=$(jq -r '.success | to_entries[0].value.nodeId' /tmp/garage-node-info.json)\n\
+            echo \"Node ID: ${NODE_ID}\"\n\nif [ -z \"$NODE_ID\" ] || [ \"$NODE_ID\"\
+            \ = \"null\" ]; then\n    echo \"ERROR: Failed to retrieve node ID\"\n\
+            \    exit 1\nfi\n\n# ===== LAYOUT MANAGEMENT VIA REMOTE RPC =====\n# Use\
+            \ garage CLI with -h and -s flags to connect remotely\n# -h requires format:\
+            \ <node-id>@<host>:<port>\n# -s provides the RPC secret\n\n# Construct\
+            \ full RPC identifier\nRPC_HOST=\"${NODE_ID}@garage:3901\"\necho \"RPC\
+            \ Host: ${RPC_HOST}\"\n\n# Check current layout to see if node is already\
+            \ assigned (idempotent)\necho \"Checking current cluster layout...\"\n\
+            LAYOUT_OUTPUT=$(garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\"\
+            \ layout show 2>&1)\n\n# Check if node already has a role assigned\n#\
+            \ Layout output shows abbreviated node ID (first 16 chars)\nNODE_ID_SHORT=\"\
+            ${NODE_ID:0:16}\"\nif echo \"$LAYOUT_OUTPUT\" | grep -q \"$NODE_ID_SHORT\"\
+            ; then\n    echo \"Node ${NODE_ID_SHORT}... already assigned in layout,\
+            \ skipping.\"\nelse\n    echo \"Assigning node to cluster layout...\"\n\
+            \    # Assign node to zone dc1 with configured capacity\n    garage -h\
+            \ \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n        layout assign\
+            \ ${NODE_ID} -z dc1 -c ${GARAGE_DATA_SIZE}\n\n    echo \"Applying layout\
+            \ configuration...\"\n    # Get current staged version and apply\n   \
+            \ garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n        layout\
+            \ apply --version 1\n\n    echo \"Layout configured successfully.\"\n\
+            \    # Wait for layout to stabilize\n    sleep 5\nfi\n\n# ===== KEY MANAGEMENT\
+            \ VIA REMOTE RPC =====\n\n# Check if key already exists (idempotent)\n\
+            # GARAGE_ACCESS_KEY is already a valid Garage Key ID (GK + 24 hex chars)\n\
+            if garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" key info \"${GARAGE_ACCESS_KEY}\"\
+            \ >/dev/null 2>&1; then\n    echo \"Access key ${GARAGE_ACCESS_KEY} already\
+            \ exists, skipping creation.\"\nelse\n    echo \"Importing S3 access key:\
+            \ ${GARAGE_ACCESS_KEY}\"\n\n    # Import key with the provided credentials\
+            \ (both already in valid Garage format)\n    # GARAGE_ACCESS_KEY = Key\
+            \ ID (GK + 24 hex chars)\n    # GARAGE_SECRET_KEY = Secret (64 hex chars)\n\
+            \    garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n      \
+            \  key import \"${GARAGE_ACCESS_KEY}\" \"${GARAGE_SECRET_KEY}\" --yes\n\
+            \n    echo \"Access key imported successfully.\"\nfi\n\n# Grant permissions\
+            \ to the key\necho \"Granting create-bucket permission to key...\"\ngarage\
+            \ -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n    key allow --create-bucket\
+            \ \"${GARAGE_ACCESS_KEY}\"\n\necho \"\"\necho \"Garage initialization\
+            \ complete!\"\necho \"S3 Endpoint: http://garage:3900\"\necho \"Region:\
+            \ ${GARAGE_REGION}\"\nexit 0\n"
+          env:
+          - name: GARAGE_ACCESS_KEY
+            value: GK000000000000000000000001
+          - name: GARAGE_ADMIN_TOKEN
+            value: batts-rockhearted-unpartially
+          - name: GARAGE_DATA_SIZE
+            value: 5G
+          - name: GARAGE_REGION
+            value: garage
+          - name: GARAGE_RPC_SECRET
+            value: bbba746a9e289bad64a9e7a36a4299dac8d6e0b8cc2a6c2937fe756df4492008
+          - name: GARAGE_SECRET_KEY
+            value: b171f00be9be4c32c734f4c05fe64c527a8ab5eb823b376cfa8c2531f70fc427
+          image: docker.io/alpine:3.23.2
+          name: garage-init
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 256M
+            requests:
+              cpu: '0.25'
+              memory: 128M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+          - mountPath: /etc/garage/
+            name: garage-cfg
+        volumes:
+        - configMap:
+            name: garage-cfg
+          name: garage-cfg
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: garage
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: s3-api
+      port: 3900
+      targetPort: 3900
+    - name: rpc
+      port: 3901
+      targetPort: 3901
+    - name: web
+      port: 3902
+      targetPort: 3902
+    - name: admin
+      port: 3903
+      targetPort: 3903
+    - name: k2v
+      port: 3904
+      targetPort: 3904
+    selector:
+      app: garage
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -542,20 +819,86 @@ items:
       \ a custom UID to reference this\n    # data source in other parts of the configuration.\n\
       \    # If not specified, Grafana generates one.\n    uid: 'f6b18033-5918-4e05-a1ca-4cb30343b129'\n\
       \n    url: http://prometheus:9090\n\n    basicAuth: false\n    withCredentials:\
-      \ false\n    isDefault: true\n    editable: true\n\n"
+      \ false\n    isDefault: true\n    editable: true\n\n  - name: Loki\n    type:\
+      \ loki\n    access: proxy\n    orgId: 1\n    # <string> Sets a custom UID to\
+      \ reference this\n    # data source in other parts of the configuration.\n \
+      \   # If not specified, Grafana generates one.\n    uid: 'cf6m73l5rnvuod'\n\n\
+      \    url: http://loki:3100\n\n    basicAuth: false\n    withCredentials: false\n\
+      \    editable: true\n\n"
   kind: ConfigMap
   metadata:
     name: prov-data
     namespace: trustgraph
 - apiVersion: v1
   data:
-    dashboard.json: "{\n  \"annotations\": {\n    \"list\": [\n      {\n        \"\
-      builtIn\": 1,\n        \"datasource\": {\n          \"type\": \"grafana\",\n\
-      \          \"uid\": \"-- Grafana --\"\n        },\n        \"enable\": true,\n\
+    log-dashboard.json: "{\n  \"annotations\": {\n    \"list\": [\n      {\n     \
+      \   \"builtIn\": 1,\n        \"datasource\": {\n          \"type\": \"grafana\"\
+      ,\n          \"uid\": \"-- Grafana --\"\n        },\n        \"enable\": true,\n\
       \        \"hide\": true,\n        \"iconColor\": \"rgba(0, 211, 255, 1)\",\n\
       \        \"name\": \"Annotations & Alerts\",\n        \"type\": \"dashboard\"\
       \n      }\n    ]\n  },\n  \"editable\": true,\n  \"fiscalYearStartMonth\": 0,\n\
-      \  \"graphTooltip\": 0,\n  \"id\": 2,\n  \"links\": [],\n  \"panels\": [\n \
+      \  \"graphTooltip\": 0,\n  \"id\": 3,\n  \"links\": [],\n  \"panels\": [\n \
+      \   {\n      \"datasource\": {\n        \"type\": \"loki\",\n        \"uid\"\
+      : \"cf6m73l5rnvuod\"\n      },\n      \"fieldConfig\": {\n        \"defaults\"\
+      : {\n          \"color\": {\n            \"mode\": \"palette-classic\"\n   \
+      \       },\n          \"custom\": {\n            \"axisBorderShow\": false,\n\
+      \            \"axisCenteredZero\": false,\n            \"axisColorMode\": \"\
+      text\",\n            \"axisLabel\": \"\",\n            \"axisPlacement\": \"\
+      auto\",\n            \"fillOpacity\": 33,\n            \"gradientMode\": \"\
+      none\",\n            \"hideFrom\": {\n              \"legend\": false,\n   \
+      \           \"tooltip\": false,\n              \"viz\": false\n            },\n\
+      \            \"lineWidth\": 1,\n            \"scaleDistribution\": {\n     \
+      \         \"type\": \"linear\"\n            },\n            \"thresholdsStyle\"\
+      : {\n              \"mode\": \"off\"\n            }\n          },\n        \
+      \  \"mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"\
+      absolute\",\n            \"steps\": [\n              {\n                \"color\"\
+      : \"green\",\n                \"value\": 0\n              },\n             \
+      \ {\n                \"color\": \"red\",\n                \"value\": 80\n  \
+      \            }\n            ]\n          }\n        },\n        \"overrides\"\
+      : []\n      },\n      \"gridPos\": {\n        \"h\": 6,\n        \"w\": 24,\n\
+      \        \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 2,\n      \"options\"\
+      : {\n        \"barRadius\": 0,\n        \"barWidth\": 0.97,\n        \"fullHighlight\"\
+      : false,\n        \"groupWidth\": 0.7,\n        \"legend\": {\n          \"\
+      calcs\": [],\n          \"displayMode\": \"list\",\n          \"placement\"\
+      : \"bottom\",\n          \"showLegend\": true\n        },\n        \"orientation\"\
+      : \"auto\",\n        \"showValue\": \"never\",\n        \"stacking\": \"normal\"\
+      ,\n        \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\"\
+      : \"single\",\n          \"sort\": \"none\"\n        },\n        \"xTickLabelRotation\"\
+      : 0,\n        \"xTickLabelSpacing\": 100\n      },\n      \"pluginVersion\"\
+      : \"12.1.1\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"loki\",\n            \"uid\": \"cf6m73l5rnvuod\"\n\
+      \          },\n          \"direction\": \"backward\",\n          \"editorMode\"\
+      : \"code\",\n          \"expr\": \"topk(5, sum by (processor) (count_over_time({severity=~\\\
+      \"error|critical\\\"} [$__auto])))\",\n          \"queryType\": \"range\",\n\
+      \          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Error volume\"\
+      ,\n      \"type\": \"barchart\"\n    },\n    {\n      \"datasource\": {\n  \
+      \      \"type\": \"loki\",\n        \"uid\": \"cf6m73l5rnvuod\"\n      },\n\
+      \      \"fieldConfig\": {\n        \"defaults\": {},\n        \"overrides\"\
+      : []\n      },\n      \"gridPos\": {\n        \"h\": 18,\n        \"w\": 24,\n\
+      \        \"x\": 0,\n        \"y\": 6\n      },\n      \"id\": 1,\n      \"options\"\
+      : {\n        \"dedupStrategy\": \"none\",\n        \"enableInfiniteScrolling\"\
+      : false,\n        \"enableLogDetails\": true,\n        \"prettifyLogMessage\"\
+      : false,\n        \"showCommonLabels\": false,\n        \"showLabels\": false,\n\
+      \        \"showTime\": false,\n        \"sortOrder\": \"Descending\",\n    \
+      \    \"wrapLogMessage\": true\n      },\n      \"pluginVersion\": \"12.1.1\"\
+      ,\n      \"targets\": [\n        {\n          \"datasource\": {\n          \
+      \  \"type\": \"loki\",\n            \"uid\": \"cf6m73l5rnvuod\"\n          },\n\
+      \          \"direction\": \"backward\",\n          \"editorMode\": \"builder\"\
+      ,\n          \"expr\": \"{severity=~\\\"error|critical\\\"} |= ``\",\n     \
+      \     \"queryType\": \"range\",\n          \"refId\": \"A\"\n        }\n   \
+      \   ],\n      \"title\": \"Log errors\",\n      \"type\": \"logs\"\n    }\n\
+      \  ],\n  \"preload\": false,\n  \"schemaVersion\": 41,\n  \"tags\": [],\n  \"\
+      templating\": {\n    \"list\": []\n  },\n  \"time\": {\n    \"from\": \"now-15m\"\
+      ,\n    \"to\": \"now\"\n  },\n  \"timepicker\": {},\n  \"timezone\": \"browser\"\
+      ,\n  \"title\": \"Logs\",\n  \"uid\": \"4bdce405-0dd3-4a14-9a8f-792152ebebba\"\
+      ,\n  \"version\": 13\n}\n"
+    overview-dashboard.json: "{\n  \"annotations\": {\n    \"list\": [\n      {\n\
+      \        \"builtIn\": 1,\n        \"datasource\": {\n          \"type\": \"\
+      grafana\",\n          \"uid\": \"-- Grafana --\"\n        },\n        \"enable\"\
+      : true,\n        \"hide\": true,\n        \"iconColor\": \"rgba(0, 211, 255,\
+      \ 1)\",\n        \"name\": \"Annotations & Alerts\",\n        \"type\": \"dashboard\"\
+      \n      }\n    ]\n  },\n  \"editable\": true,\n  \"fiscalYearStartMonth\": 0,\n\
+      \  \"graphTooltip\": 0,\n  \"id\": 3,\n  \"links\": [],\n  \"panels\": [\n \
       \   {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
       uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\"\
       : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":\
@@ -570,100 +913,102 @@ items:
       \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 12,\n   \
-      \     \"x\": 0,\n        \"y\": 0\n      },\n      \"id\": 17,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"editorMode\": \"code\",\n          \"expr\": \"producer_count_total{processor=\\\
-      \"chunker\\\",name=\\\"output\\\"}\\n- ignoring(instance, job, processor, name,\
-      \ status)\\nprocessing_count_total{processor=\\\"kg-extract-relationships\\\"\
-      , name=\\\"input\\\"}\",\n          \"legendFormat\": \"__auto\",\n        \
-      \  \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n     \
-      \ \"title\": \"Knowledge extraction backlog\",\n      \"type\": \"timeseries\"\
-      \n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
-      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
-      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
-      \        \"mode\": \"palette-classic\"\n          },\n          \"custom\":\
-      \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
-      : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
-      : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
-      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
-      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
-      \            \"hideFrom\": {\n              \"legend\": false,\n           \
-      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
-      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 0\n \
+      \     },\n      \"id\": 17,\n      \"options\": {\n        \"legend\": {\n \
+      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"editorMode\": \"\
+      code\",\n          \"expr\": \"producer_count_total{processor=\\\"chunker\\\"\
+      ,name=\\\"output\\\"}\\n- ignoring(instance, job, processor, name, status)\\\
+      nprocessing_count_total{processor=\\\"kg-extract-relationships\\\", name=\\\"\
+      input\\\"}\",\n          \"legendFormat\": \"__auto\",\n          \"range\"\
+      : true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"\
+      Knowledge extraction backlog\",\n      \"type\": \"timeseries\"\n    },\n  \
+      \  {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
+      uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\"\
+      : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":\
+      \ \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
+      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
+      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
+      \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
+      \         \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n \
+      \           \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n \
+      \           \"hideFrom\": {\n              \"legend\": false,\n            \
+      \  \"tooltip\": false,\n              \"viz\": false\n            },\n     \
+      \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 6,\n    \
-      \    \"x\": 12,\n        \"y\": 0\n      },\n      \"id\": 19,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"editorMode\": \"code\",\n          \"expr\": \"(producer_count_total{processor=\\\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 6,\n        \"x\": 12,\n        \"y\": 0\n \
+      \     },\n      \"id\": 19,\n      \"options\": {\n        \"legend\": {\n \
+      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"editorMode\": \"\
+      code\",\n          \"expr\": \"(producer_count_total{processor=\\\"graph-embeddings\\\
+      \",name=\\\"output\\\"} - ignoring(instance, job, processor, name, status) processing_count_total{processor=\\\
+      \"ge-write\\\",name=\\\"input\\\"} >= 2)\\nor\\n(0 * (producer_count_total{processor=\\\
       \"graph-embeddings\\\",name=\\\"output\\\"} - ignoring(instance, job, processor,\
       \ name, status) processing_count_total{processor=\\\"ge-write\\\",name=\\\"\
-      input\\\"} >= 2)\\nor\\n(0 * (producer_count_total{processor=\\\"graph-embeddings\\\
-      \",name=\\\"output\\\"} - ignoring(instance, job, processor, name, status) processing_count_total{processor=\\\
-      \"ge-write\\\",name=\\\"input\\\"}))\",\n          \"legendFormat\": \"__auto\"\
-      ,\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n     \
-      \ ],\n      \"title\": \"Graph embeddings backlog\",\n      \"type\": \"timeseries\"\
-      \n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
-      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
-      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
-      \        \"mode\": \"palette-classic\"\n          },\n          \"custom\":\
-      \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
-      : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
-      : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
-      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
-      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
-      \            \"hideFrom\": {\n              \"legend\": false,\n           \
-      \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
-      \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      input\\\"}))\",\n          \"legendFormat\": \"__auto\",\n          \"range\"\
+      : true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"\
+      Graph embeddings backlog\",\n      \"type\": \"timeseries\"\n    },\n    {\n\
+      \      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\"\
+      : \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\"\
+      : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":\
+      \ \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
+      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
+      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
+      \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
+      \         \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n \
+      \           \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n \
+      \           \"hideFrom\": {\n              \"legend\": false,\n            \
+      \  \"tooltip\": false,\n              \"viz\": false\n            },\n     \
+      \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 6,\n    \
-      \    \"x\": 18,\n        \"y\": 0\n      },\n      \"id\": 18,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"editorMode\": \"code\",\n          \"expr\": \"(clamp_min(\\\
-      n  (\\n    producer_count_total{processor=\\\"kg-extract-definitions\\\",name=\\\
-      \"triples\\\"}\\n    + on(flow)\\n    producer_count_total{processor=\\\"kg-extract-relationships\\\
-      \",name=\\\"triples\\\"}\\n  )\\n  - on(flow) processing_count_total{processor=\\\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 6,\n        \"x\": 18,\n        \"y\": 0\n \
+      \     },\n      \"id\": 18,\n      \"options\": {\n        \"legend\": {\n \
+      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"editorMode\": \"\
+      code\",\n          \"expr\": \"(clamp_min(\\n  (\\n    producer_count_total{processor=\\\
+      \"kg-extract-definitions\\\",name=\\\"triples\\\"}\\n    + on(flow)\\n    producer_count_total{processor=\\\
+      \"kg-extract-relationships\\\",name=\\\"triples\\\"}\\n  )\\n  - on(flow) processing_count_total{processor=\\\
       \"triples-write\\\",name=\\\"input\\\"},\\n  0\\n) >= 2) or (0 * clamp_min(\\\
       n  (\\n    producer_count_total{processor=\\\"kg-extract-definitions\\\",name=\\\
       \"triples\\\"}\\n    + on(flow)\\n    producer_count_total{processor=\\\"kg-extract-relationships\\\
@@ -691,7 +1036,7 @@ items:
       \        \"mode\": \"single\",\n          \"showColorScale\": false,\n     \
       \     \"yHistogram\": false\n        },\n        \"yAxis\": {\n          \"\
       axisPlacement\": \"left\",\n          \"reverse\": false\n        }\n      },\n\
-      \      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n        {\n   \
+      \      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n   \
       \       \"datasource\": {\n            \"type\": \"prometheus\",\n         \
       \   \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n      \
       \    \"disableTextWrap\": false,\n          \"editorMode\": \"builder\",\n \
@@ -722,7 +1067,7 @@ items:
       \          \"showColorScale\": false,\n          \"yHistogram\": false\n   \
       \     },\n        \"yAxis\": {\n          \"axisLabel\": \"processing status\"\
       ,\n          \"axisPlacement\": \"left\",\n          \"reverse\": false\n  \
-      \      }\n      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\"\
+      \      }\n      },\n      \"pluginVersion\": \"12.3.0\",\n      \"targets\"\
       : [\n        {\n          \"datasource\": {\n            \"type\": \"prometheus\"\
       ,\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n         \
       \ },\n          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
@@ -746,26 +1091,26 @@ items:
       \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 9,\n        \"w\": 12,\n   \
-      \     \"x\": 0,\n        \"y\": 15\n      },\n      \"id\": 1,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
-      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
-      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"expr\": \"sum by(processor) (rate(request_latency_count{processor!=\\\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 9,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 15\n\
+      \      },\n      \"id\": 1,\n      \"options\": {\n        \"legend\": {\n \
+      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
+      : \"builder\",\n          \"expr\": \"sum by(processor) (rate(request_latency_count{processor!=\\\
       \"config-svc\\\"}[$__rate_interval]))\",\n          \"fullMetaSearch\": false,\n\
       \          \"includeNullMetadata\": true,\n          \"instant\": false,\n \
       \         \"legendFormat\": \"{{job}}\",\n          \"range\": true,\n     \
@@ -785,26 +1130,26 @@ items:
       \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 9,\n        \"w\": 12,\n   \
-      \     \"x\": 12,\n        \"y\": 15\n      },\n      \"id\": 5,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
-      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
-      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"expr\": \"pulsar_msg_backlog{topic!=\\\"persistent://tg/config/config\\\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 9,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 15\n\
+      \      },\n      \"id\": 5,\n      \"options\": {\n        \"legend\": {\n \
+      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
+      : \"builder\",\n          \"expr\": \"pulsar_msg_backlog{topic!=\\\"persistent://tg/config/config\\\
       \"}\",\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\"\
       : true,\n          \"instant\": false,\n          \"legendFormat\": \"{{topic}}\"\
       ,\n          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
@@ -838,7 +1183,7 @@ items:
       \ \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"single\"\
       ,\n          \"sort\": \"none\"\n        },\n        \"xTickLabelRotation\"\
       : 0,\n        \"xTickLabelSpacing\": 0\n      },\n      \"pluginVersion\": \"\
-      12.1.1\",\n      \"targets\": [\n        {\n          \"datasource\": {\n  \
+      12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n  \
       \          \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
       : \"builder\",\n          \"exemplar\": false,\n          \"expr\": \"max by(le)\
@@ -861,50 +1206,51 @@ items:
       \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 12,\n   \
-      \     \"x\": 12,\n        \"y\": 24\n      },\n      \"id\": 11,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
-      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
-      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"exemplar\": false,\n          \"expr\": \"sum by(job) (increase(rate_limit_count_total[$__rate_interval]))\"\
-      ,\n          \"format\": \"time_series\",\n          \"fullMetaSearch\": false,\n\
-      \          \"includeNullMetadata\": true,\n          \"instant\": false,\n \
-      \         \"legendFormat\": \"{{instance}}\",\n          \"range\": true,\n\
-      \          \"refId\": \"A\",\n          \"useBackend\": false\n        }\n \
-      \     ],\n      \"title\": \"Rate limit events\",\n      \"type\": \"timeseries\"\
-      \n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
-      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
-      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
-      \        \"fixedColor\": \"light-blue\",\n            \"mode\": \"palette-classic\"\
-      \n          },\n          \"custom\": {\n            \"axisBorderShow\": false,\n\
-      \            \"axisCenteredZero\": false,\n            \"axisColorMode\": \"\
-      text\",\n            \"axisLabel\": \"\",\n            \"axisPlacement\": \"\
-      auto\",\n            \"barAlignment\": 0,\n            \"barWidthFactor\": 0.6,\n\
-      \            \"drawStyle\": \"line\",\n            \"fillOpacity\": 0,\n   \
-      \         \"gradientMode\": \"none\",\n            \"hideFrom\": {\n       \
-      \       \"legend\": false,\n              \"tooltip\": false,\n            \
-      \  \"viz\": false\n            },\n            \"insertNulls\": false,\n   \
-      \         \"lineInterpolation\": \"linear\",\n            \"lineWidth\": 1,\n\
-      \            \"pointSize\": 5,\n            \"scaleDistribution\": {\n     \
-      \         \"type\": \"linear\"\n            },\n            \"showPoints\":\
-      \ \"auto\",\n            \"spanNulls\": false,\n            \"stacking\": {\n\
-      \              \"group\": \"A\",\n              \"mode\": \"none\"\n       \
-      \     },\n            \"thresholdsStyle\": {\n              \"mode\": \"off\"\
-      \n            }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 24\n\
+      \      },\n      \"id\": 11,\n      \"options\": {\n        \"legend\": {\n\
+      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
+      : \"builder\",\n          \"exemplar\": false,\n          \"expr\": \"sum by(job)\
+      \ (increase(rate_limit_count_total[$__rate_interval]))\",\n          \"format\"\
+      : \"time_series\",\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\"\
+      : true,\n          \"instant\": false,\n          \"legendFormat\": \"{{instance}}\"\
+      ,\n          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
+      : false\n        }\n      ],\n      \"title\": \"Rate limit events\",\n    \
+      \  \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\n      \
+      \  \"type\": \"prometheus\",\n        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
+      color\": {\n            \"fixedColor\": \"light-blue\",\n            \"mode\"\
+      : \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
+      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
+      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n     \
+      \       \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n   \
+      \         \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n \
+      \           \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n \
+      \           \"hideFrom\": {\n              \"legend\": false,\n            \
+      \  \"tooltip\": false,\n              \"viz\": false\n            },\n     \
+      \       \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
+      ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
+      \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
       : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
       \       {\n                \"color\": \"green\",\n                \"value\"\
       : 0\n              },\n              {\n                \"color\": \"red\",\n\
@@ -916,7 +1262,7 @@ items:
       placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
       \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
       single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
-      : \"12.1.1\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
       \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
       : \"builder\",\n          \"expr\": \"rate(process_cpu_seconds_total[$__rate_interval])\"\
@@ -938,37 +1284,38 @@ items:
       \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n   \
-      \     \"x\": 12,\n        \"y\": 31\n      },\n      \"id\": 13,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
-      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
-      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"expr\": \"process_resident_memory_bytes / 1073741824\",\n   \
-      \       \"fullMetaSearch\": false,\n          \"includeNullMetadata\": true,\n\
-      \          \"instant\": false,\n          \"legendFormat\": \"{{instance}}\"\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 8,\n        \"w\": 12,\n        \"x\": 12,\n        \"y\": 31\n\
+      \      },\n      \"id\": 13,\n      \"options\": {\n        \"legend\": {\n\
+      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
+      : \"builder\",\n          \"expr\": \"process_resident_memory_bytes / 1073741824\"\
+      ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
+      \ true,\n          \"instant\": false,\n          \"legendFormat\": \"{{instance}}\"\
       ,\n          \"range\": true,\n          \"refId\": \"A\",\n          \"useBackend\"\
       : false\n        }\n      ],\n      \"title\": \"Memory\",\n      \"type\":\
-      \ \"timeseries\"\n    },\n    {\n      \"datasource\": {\n        \"type\":\
-      \ \"prometheus\",\n        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
-      color\": {\n            \"mode\": \"thresholds\"\n          },\n          \"\
-      custom\": {\n            \"align\": \"auto\",\n            \"cellOptions\":\
-      \ {\n              \"type\": \"auto\"\n            },\n            \"filterable\"\
-      : false,\n            \"inspect\": false\n          },\n          \"mappings\"\
+      \ \"timeseries\"\n    },\n    {\n      \"datasource\": {\n        \"uid\": \"\
+      f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\": {\n\
+      \        \"defaults\": {\n          \"color\": {\n            \"mode\": \"thresholds\"\
+      \n          },\n          \"custom\": {\n            \"align\": \"auto\",\n\
+      \            \"cellOptions\": {\n              \"type\": \"auto\"\n        \
+      \    },\n            \"footer\": {\n              \"reducers\": []\n       \
+      \     },\n            \"hideFrom\": {\n              \"viz\": false\n      \
+      \      },\n            \"inspect\": false\n          },\n          \"mappings\"\
       : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n  \
       \          \"steps\": [\n              {\n                \"color\": \"green\"\
       ,\n                \"value\": 0\n              },\n              {\n       \
@@ -976,34 +1323,22 @@ items:
       \ }\n            ]\n          }\n        },\n        \"overrides\": []\n   \
       \   },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n       \
       \ \"x\": 0,\n        \"y\": 39\n      },\n      \"id\": 14,\n      \"options\"\
-      : {\n        \"cellHeight\": \"sm\",\n        \"footer\": {\n          \"countRows\"\
-      : false,\n          \"fields\": \"\",\n          \"reducer\": [\n          \
-      \  \"sum\"\n          ],\n          \"show\": false\n        },\n        \"\
-      showHeader\": true\n      },\n      \"pluginVersion\": \"12.1.1\",\n      \"\
-      targets\": [\n        {\n          \"datasource\": {\n            \"type\":\
-      \ \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
-      \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"exemplar\": false,\n          \"expr\": \"last_over_time(params_info[$__interval])\"\
-      ,\n          \"format\": \"table\",\n          \"fullMetaSearch\": false,\n\
-      \          \"includeNullMetadata\": true,\n          \"instant\": true,\n  \
-      \        \"legendFormat\": \"__auto\",\n          \"range\": false,\n      \
-      \    \"refId\": \"A\",\n          \"useBackend\": false\n        }\n      ],\n\
-      \      \"title\": \"Model parameters\",\n      \"transformations\": [\n    \
-      \    {\n          \"id\": \"filterFieldsByName\",\n          \"options\": {\n\
-      \            \"include\": {\n              \"names\": [\n                \"\
-      model\",\n                \"job\"\n              ]\n            }\n        \
-      \  }\n        },\n        {\n          \"id\": \"filterByValue\",\n        \
-      \  \"options\": {\n            \"filters\": [\n              {\n           \
-      \     \"config\": {\n                  \"id\": \"equal\",\n                \
-      \  \"options\": {\n                    \"value\": \"\"\n                  }\n\
-      \                },\n                \"fieldName\": \"model\"\n            \
-      \  }\n            ],\n            \"match\": \"all\",\n            \"type\"\
-      : \"exclude\"\n          }\n        }\n      ],\n      \"type\": \"table\"\n\
-      \    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n\
-      \        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n     \
-      \ \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n    \
-      \        \"mode\": \"palette-classic\"\n          },\n          \"custom\":\
-      \ {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
+      : {\n        \"cellHeight\": \"sm\",\n        \"showHeader\": true\n      },\n\
+      \      \"pluginVersion\": \"12.3.0\",\n      \"targets\": [\n        {\n   \
+      \       \"editorMode\": \"code\",\n          \"exemplar\": false,\n        \
+      \  \"expr\": \"sum by (model) (tokens_total)\",\n          \"format\": \"table\"\
+      ,\n          \"instant\": true,\n          \"legendFormat\": \"__auto\",\n \
+      \         \"range\": false,\n          \"refId\": \"A\"\n        }\n      ],\n\
+      \      \"title\": \"Models in use\",\n      \"transformations\": [\n       \
+      \ {\n          \"id\": \"organize\",\n          \"options\": {\n           \
+      \ \"excludeByName\": {\n              \"Time\": true\n            },\n     \
+      \       \"includeByName\": {},\n            \"indexByName\": {},\n         \
+      \   \"renameByName\": {}\n          }\n        }\n      ],\n      \"type\":\
+      \ \"table\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\"\
+      ,\n        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n   \
+      \   \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n  \
+      \          \"mode\": \"palette-classic\"\n          },\n          \"custom\"\
+      : {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
       : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
       : \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
       : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
@@ -1013,89 +1348,74 @@ items:
       \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n    \
-      \    \"x\": 8,\n        \"y\": 39\n      },\n      \"id\": 15,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
-      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
-      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"expr\": \"sum by(job) (rate(input_tokens_total[$__rate_interval]))\"\
-      ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
-      \ true,\n          \"instant\": false,\n          \"legendFormat\": \"input\
-      \ {{job}}\",\n          \"range\": true,\n          \"refId\": \"A\",\n    \
-      \      \"useBackend\": false\n        },\n        {\n          \"datasource\"\
-      : {\n            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 8,\n        \"x\": 8,\n        \"y\": 39\n \
+      \     },\n      \"id\": 15,\n      \"options\": {\n        \"legend\": {\n \
+      \         \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"sum by(job) (rate(output_tokens_total[$__rate_interval]))\"\
-      ,\n          \"fullMetaSearch\": false,\n          \"hide\": false,\n      \
-      \    \"includeNullMetadata\": true,\n          \"instant\": false,\n       \
-      \   \"legendFormat\": \"output {{job}}\",\n          \"range\": true,\n    \
-      \      \"refId\": \"B\",\n          \"useBackend\": false\n        }\n     \
-      \ ],\n      \"title\": \"Tokens\",\n      \"type\": \"timeseries\"\n    },\n\
-      \    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n       \
-      \ \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n      },\n      \"fieldConfig\"\
-      : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":\
-      \ \"palette-classic\"\n          },\n          \"custom\": {\n            \"\
-      axisBorderShow\": false,\n            \"axisCenteredZero\": false,\n       \
-      \     \"axisColorMode\": \"text\",\n            \"axisLabel\": \"$\",\n    \
-      \        \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n  \
-      \          \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\",\n\
-      \            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
+      : \"builder\",\n          \"expr\": \"sum by(model, direction)  (rate(tokens_total[$__rate_interval]))\"\
+      ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
+      \ true,\n          \"instant\": false,\n          \"legendFormat\": \"{{model}}\
+      \ - {{direction}}\",\n          \"range\": true,\n          \"refId\": \"A\"\
+      ,\n          \"useBackend\": false\n        }\n      ],\n      \"title\": \"\
+      Tokens\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\"\
+      : {\n        \"type\": \"prometheus\",\n        \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
+      color\": {\n            \"mode\": \"palette-classic\"\n          },\n      \
+      \    \"custom\": {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\"\
+      : false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\"\
+      : \"$\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\"\
+      : 0,\n            \"barWidthFactor\": 0.6,\n            \"drawStyle\": \"line\"\
+      ,\n            \"fillOpacity\": 0,\n            \"gradientMode\": \"none\",\n\
       \            \"hideFrom\": {\n              \"legend\": false,\n           \
       \   \"tooltip\": false,\n              \"viz\": false\n            },\n    \
       \        \"insertNulls\": false,\n            \"lineInterpolation\": \"linear\"\
       ,\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n          \
       \  \"scaleDistribution\": {\n              \"type\": \"linear\"\n          \
-      \  },\n            \"showPoints\": \"auto\",\n            \"spanNulls\": false,\n\
-      \            \"stacking\": {\n              \"group\": \"A\",\n            \
-      \  \"mode\": \"none\"\n            },\n            \"thresholdsStyle\": {\n\
-      \              \"mode\": \"off\"\n            }\n          },\n          \"\
-      mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
-      ,\n            \"steps\": [\n              {\n                \"color\": \"\
-      green\",\n                \"value\": 0\n              },\n              {\n\
-      \                \"color\": \"red\",\n                \"value\": 80\n      \
-      \        }\n            ]\n          }\n        },\n        \"overrides\": []\n\
-      \      },\n      \"gridPos\": {\n        \"h\": 7,\n        \"w\": 8,\n    \
-      \    \"x\": 16,\n        \"y\": 39\n      },\n      \"id\": 16,\n      \"options\"\
-      : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
-      : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
-      : true\n        },\n        \"tooltip\": {\n          \"hideZeros\": false,\n\
-      \          \"mode\": \"single\",\n          \"sort\": \"none\"\n        }\n\
-      \      },\n      \"pluginVersion\": \"12.1.1\",\n      \"targets\": [\n    \
-      \    {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n\
-      \            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\n          },\n\
-      \          \"disableTextWrap\": false,\n          \"editorMode\": \"builder\"\
-      ,\n          \"expr\": \"sum by(job) (rate(input_cost_total[$__rate_interval]))\"\
-      ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
-      \ true,\n          \"instant\": false,\n          \"legendFormat\": \"input\
-      \ {{job}}\",\n          \"range\": true,\n          \"refId\": \"A\",\n    \
-      \      \"useBackend\": false\n        },\n        {\n          \"datasource\"\
-      : {\n            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
+      \  },\n            \"showPoints\": \"auto\",\n            \"showValues\": false,\n\
+      \            \"spanNulls\": false,\n            \"stacking\": {\n          \
+      \    \"group\": \"A\",\n              \"mode\": \"none\"\n            },\n \
+      \           \"thresholdsStyle\": {\n              \"mode\": \"off\"\n      \
+      \      }\n          },\n          \"mappings\": [],\n          \"thresholds\"\
+      : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n       \
+      \       {\n                \"color\": \"green\",\n                \"value\"\
+      : 0\n              },\n              {\n                \"color\": \"red\",\n\
+      \                \"value\": 80\n              }\n            ]\n          }\n\
+      \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n   \
+      \     \"h\": 7,\n        \"w\": 8,\n        \"x\": 16,\n        \"y\": 39\n\
+      \      },\n      \"id\": 16,\n      \"options\": {\n        \"legend\": {\n\
+      \          \"calcs\": [],\n          \"displayMode\": \"list\",\n          \"\
+      placement\": \"bottom\",\n          \"showLegend\": true\n        },\n     \
+      \   \"tooltip\": {\n          \"hideZeros\": false,\n          \"mode\": \"\
+      single\",\n          \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\"\
+      : \"12.3.0\",\n      \"targets\": [\n        {\n          \"datasource\": {\n\
+      \            \"type\": \"prometheus\",\n            \"uid\": \"f6b18033-5918-4e05-a1ca-4cb30343b129\"\
       \n          },\n          \"disableTextWrap\": false,\n          \"editorMode\"\
-      : \"builder\",\n          \"expr\": \"sum by(job) (rate(output_cost_total[$__rate_interval]))\"\
-      ,\n          \"fullMetaSearch\": false,\n          \"hide\": false,\n      \
-      \    \"includeNullMetadata\": true,\n          \"instant\": false,\n       \
-      \   \"legendFormat\": \"output {{job}}\",\n          \"range\": true,\n    \
-      \      \"refId\": \"B\",\n          \"useBackend\": false\n        }\n     \
-      \ ],\n      \"title\": \"Token cost\",\n      \"type\": \"timeseries\"\n   \
-      \ }\n  ],\n  \"preload\": false,\n  \"refresh\": \"5s\",\n  \"schemaVersion\"\
-      : 41,\n  \"tags\": [],\n  \"templating\": {\n    \"list\": []\n  },\n  \"time\"\
-      : {\n    \"from\": \"now-1h\",\n    \"to\": \"now\"\n  },\n  \"timepicker\"\
-      : {},\n  \"timezone\": \"\",\n  \"title\": \"Overview\",\n  \"uid\": \"b5c8abf8-fe79-496b-b028-10bde917d1f0\"\
-      ,\n  \"version\": 12\n}"
+      : \"builder\",\n          \"expr\": \"sum by(direction, model) (rate(tokens_total[$__rate_interval]))\"\
+      ,\n          \"fullMetaSearch\": false,\n          \"includeNullMetadata\":\
+      \ true,\n          \"instant\": false,\n          \"legendFormat\": \"{{model}}\
+      \ - {{direction}}\",\n          \"range\": true,\n          \"refId\": \"A\"\
+      ,\n          \"useBackend\": false\n        }\n      ],\n      \"title\": \"\
+      Token cost\",\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"preload\": false,\n\
+      \  \"refresh\": \"5s\",\n  \"schemaVersion\": 42,\n  \"tags\": [],\n  \"templating\"\
+      : {\n    \"list\": []\n  },\n  \"time\": {\n    \"from\": \"now-1h\",\n    \"\
+      to\": \"now\"\n  },\n  \"timepicker\": {},\n  \"timezone\": \"\",\n  \"title\"\
+      : \"Overview\",\n  \"uid\": \"b5c8abf8-fe79-496b-b028-10bde917d1f0\",\n  \"\
+      version\": 1\n}\n"
   kind: ConfigMap
   metadata:
     name: dashboards
@@ -1121,7 +1441,7 @@ items:
         - env:
           - name: GF_ORG_NAME
             value: trustgraph.ai
-          image: docker.io/grafana/grafana:12.1.1
+          image: docker.io/grafana/grafana:12.3.0
           name: grafana
           ports:
           - containerPort: 3000
@@ -1194,7 +1514,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: graph-embeddings
           resources:
             limits:
@@ -1251,7 +1571,7 @@ items:
           - '2'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: graph-rag
           resources:
             limits:
@@ -1278,16 +1598,18 @@ items:
       app: graph-rag
 - apiVersion: v1
   data:
-    config.json: '{"flow-classes": {"document-rag": {"class": {}, "description": "DocumentRAG
-      only", "flow": {"chunker:{id}": {"chunk-overlap": "{chunk-overlap}", "chunk-size":
-      "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}", "output":
-      "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request": "non-persistent://tg/request/document-embeddings:{id}",
-      "response": "non-persistent://tg/response/document-embeddings:{id}"}, "de-write:{id}":
-      {"input": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-embeddings:{id}":
-      {"embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
-      "non-persistent://tg/response/embeddings:{id}", "input": "persistent://tg/flow/chunk-load:{id}",
-      "output": "persistent://tg/flow/document-embeddings-store:{id}"}, "document-rag:{id}":
-      {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
+    config.json: '{"collection": {"trustgraph:default": {"collection": "default",
+      "description": "Default collection", "name": "Default Collection", "tags": ["default"],
+      "user": "default-user"}}, "flow-classes": {"document-rag": {"class": {}, "description":
+      "DocumentRAG only", "flow": {"chunker:{id}": {"chunk-overlap": "{chunk-overlap}",
+      "chunk-size": "{chunk-size}", "input": "persistent://tg/flow/text-document-load:{id}",
+      "output": "persistent://tg/flow/chunk-load:{id}"}, "de-query:{id}": {"request":
+      "non-persistent://tg/request/document-embeddings:{id}", "response": "non-persistent://tg/response/document-embeddings:{id}"},
+      "de-write:{id}": {"input": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-embeddings:{id}": {"embeddings-request": "non-persistent://tg/request/embeddings:{id}",
+      "embeddings-response": "non-persistent://tg/response/embeddings:{id}", "input":
+      "persistent://tg/flow/chunk-load:{id}", "output": "persistent://tg/flow/document-embeddings-store:{id}"},
+      "document-rag:{id}": {"document-embeddings-request": "non-persistent://tg/request/document-embeddings:{id}",
       "document-embeddings-response": "non-persistent://tg/response/document-embeddings:{id}",
       "embeddings-request": "non-persistent://tg/request/embeddings:{id}", "embeddings-response":
       "non-persistent://tg/response/embeddings:{id}", "prompt-request": "non-persistent://tg/request/prompt-rag:{id}",
@@ -2910,86 +3232,101 @@ items:
       or explanations.", "response-type": "json", "schema": {"items": {"properties":
       {"definition": {"type": "string"}, "topic": {"type": "string"}}, "required":
       ["topic", "definition"], "type": "object"}, "type": "array"}}, "template.extract-with-ontologies":
-      {"prompt": "You are a knowledge extraction expert. Extract structured triples
-      from text using ONLY the provided ontology elements.\n\n## Ontology Classes:\n\n{%
-      for class_id, class_def in classes.items() %}\n- **{{class_id}}**{% if class_def.subclass_of
+      {"prompt": "You are a knowledge extraction expert. Your task is to find entities,
+      relationships, and attributes in text based on a provided schema.\n\n## Entity
+      Types\n\nThese are the types of entities you should look for:\n\n{% for class_id,
+      class_def in classes.items() %}\n- **{{class_id}}**{% if class_def.subclass_of
       %} (subclass of {{class_def.subclass_of}}){% endif %}{% if class_def.comment
-      %}: {{class_def.comment}}{% endif %}\n{% endfor %}\n\n## Object Properties (connect
-      entities):\n\n{% for prop_id, prop_def in object_properties.items() %}\n- **{{prop_id}}**{%
-      if prop_def.domain and prop_def.range %} ({{prop_def.domain}} \u2192 {{prop_def.range}}){%
-      endif %}{% if prop_def.comment %}: {{prop_def.comment}}{% endif %}\n{% endfor
-      %}\n\n## Datatype Properties (entity attributes):\n\n{% for prop_id, prop_def
-      in datatype_properties.items() %}\n- **{{prop_id}}**{% if prop_def.domain and
+      %}: {{class_def.comment}}{% endif %}\n{% endfor %}\n\n## Relationships\n\nThese
+      relationships connect entities to other entities:\n\n{% for prop_id, prop_def
+      in object_properties.items() %}\n- **{{prop_id}}**{% if prop_def.domain and
       prop_def.range %} ({{prop_def.domain}} \u2192 {{prop_def.range}}){% endif %}{%
       if prop_def.comment %}: {{prop_def.comment}}{% endif %}\n{% endfor %}\n\n##
-      Text to Analyze:\n\n{{text}}\n\n## Extraction Rules:\n\n1. Only use classes
-      defined above for entity types\n2. Only use properties defined above for relationships
-      and attributes\n3. Respect domain and range constraints where specified\n4.
-      For class instances, use `rdf:type` as the predicate\n5. Include `rdfs:label`
-      for new entities to provide human-readable names\n6. Extract all relevant triples
-      that can be inferred from the text\n7. Use entity URIs or meaningful identifiers
-      as subjects/objects\n\n## Output Format:\n\nReturn ONLY a valid JSON array (no
-      markdown, no code blocks) containing objects with these fields:\n- \"subject\":
-      the subject entity (URI or identifier)\n- \"predicate\": the property (from
-      ontology or rdf:type/rdfs:label)\n- \"object\": the object entity or literal
-      value\n\nImportant: Return raw JSON only, with no markdown formatting, no code
-      blocks, and no backticks.\n\n## Example Output:\n\n[\n  {\"subject\": \"recipe:cornish-pasty\",
-      \"predicate\": \"rdf:type\", \"object\": \"Recipe\"},\n  {\"subject\": \"recipe:cornish-pasty\",
-      \"predicate\": \"rdfs:label\", \"object\": \"Cornish Pasty\"},\n  {\"subject\":
-      \"recipe:cornish-pasty\", \"predicate\": \"has_ingredient\", \"object\": \"ingredient:flour\"},\n  {\"subject\":
-      \"ingredient:flour\", \"predicate\": \"rdf:type\", \"object\": \"Ingredient\"},\n  {\"subject\":
-      \"ingredient:flour\", \"predicate\": \"rdfs:label\", \"object\": \"plain flour\"}\n]\n\nNow
-      extract triples from the text above.\n", "response-type": "json"}, "template.graphql-generation":
-      {"prompt": "You are a GraphQL query generation expert. Given a natural language
-      question and provided database schemas, generate a valid GraphQL query embedded
-      in valid JSON.\n\n## Question:\n{{ question }}\n\n## Provided Schemas:\n{% for
-      schema in schemas %}\n**{{ schema.name }}**: {{ schema.description }}\nFields:\n{%
-      for field in schema.fields %}- {{ field.name }} ({{ field.type }}){% if field.description
-      %}: {{ field.description }}{% endif %}{% if field.primary_key %} [PRIMARY KEY]{%
-      endif %}{% if field.required %} [REQUIRED]{% endif %}{% if field.indexed %}
-      [INDEXED]{% endif %}{% if field.enum_values %} [OPTIONS: {{ field.enum_values|join('',
-      '') }}]{% endif %}\n{% endfor %}\n{% endfor %}\n\n## GraphQL Query Rules:\n1.
-      Use the schema names as GraphQL query fields (e.g., `customers`, `orders`)\n2.
-      Apply filters using the `where` parameter with nested filter objects\n3. Available
-      filter operators per field type:\n   - String fields: `eq`, `contains`, `startsWith`,
-      `endsWith`, `in`, `not`, `not_in`\n   - Integer/Float fields: `eq`, `gt`, `gte`,
-      `lt`, `lte`, `in`, `not`, `not_in`\n4. Use `order_by` for sorting (field name
-      as string)\n5. Use `direction` for sort direction: `ASC` or `DESC`\n6. Use `limit`
-      to restrict number of results\n7. Select specific fields in the query body\n\n##
-      Task Instructions:\n1. Analyze the question to identify:\n   - What data to
-      retrieve (which fields to select)\n   - What filters to apply (where conditions)\n   -
-      What sorting is needed (order_by, direction)\n   - How many results (limit)\n\n2.
-      Generate a GraphQL query that:\n   - Uses only the provided schema names and
-      field names\n   - Applies appropriate filters based on the question\n   - Selects
-      relevant fields for the response\n   - Includes reasonable limits (default 100
-      if not specified)\n\n3. If variables are needed, include them in the response\n\n##
-      Output Format:\nReturn ONLY a valid JSON object (no markdown, no code blocks)
-      with these fields:\n- \"query\": the GraphQL query string\n- \"variables\":
-      object with any GraphQL variables (empty object if none)\n- \"confidence\":
-      float between 0.0-1.0 indicating confidence in the query\n\nImportant: Return
-      raw JSON only, with no markdown formatting, no code blocks, and no backticks.\n\n##
-      Examples:\n\nQuestion: \"Show me customers from California\"\n{\"query\": \"query
-      { customers(where: {state: {eq: \\\"California\\\"}}, limit: 100) { customer_id
-      name email state } }\", \"variables\": {}, \"confidence\": 0.92}\n\nQuestion:
-      \"Top 10 products by price\"\n{\"query\": \"query { products(order_by: \\\"price\\\",
-      direction: DESC, limit: 10) { product_id name price category } }\", \"variables\":
-      {}, \"confidence\": 0.88}\n\nQuestion: \"Recent orders over $100\"\n{\"query\":
-      \"query { orders(where: {total_amount: {gt: 100}, order_date: {gte: \\\"2024-01-01\\\"}},
-      order_by: \\\"order_date\\\", direction: DESC, limit: 50) { order_id customer_id
-      total_amount order_date status } }\", \"variables\": {}, \"confidence\": 0.96}\n\nNow
-      generate the GraphQL query for the question above.\n", "response-type": "json",
-      "schema": {"additionalProperties": false, "properties": {"confidence": {"description":
-      "Float between 0.0-1.0 indicating confidence in the generated query", "maximum":
-      1, "minimum": 0, "type": "number"}, "query": {"description": "The GraphQL query
-      string generated to answer the question", "type": "string"}, "variables": {"additionalProperties":
-      true, "description": "Object containing any GraphQL variables needed for the
-      query", "type": "object"}}, "required": ["query", "variables", "confidence"],
-      "type": "object"}}, "template.kg-prompt": {"prompt": "Study the following set
-      of knowledge statements. The statements are written in Cypher format that has
-      been extracted from a knowledge graph. Use only the provided set of knowledge
-      statements in your response. Do not speculate if the answer is not found in
-      the provided set of knowledge statements.\n\nHere''s the knowledge statements:\n{%
-      for edge in knowledge %}({{edge.s}})-[{{edge.p}}]->({{edge.o}})\n{%endfor%}\n\nUse
+      Attributes\n\nThese attributes describe entity properties (text, numbers, etc.):\n\n{%
+      for prop_id, prop_def in datatype_properties.items() %}\n- **{{prop_id}}**{%
+      if prop_def.domain and prop_def.range %} ({{prop_def.domain}} \u2192 {{prop_def.range}}){%
+      endif %}{% if prop_def.comment %}: {{prop_def.comment}}{% endif %}\n{% endfor
+      %}\n\n## Text to Analyze\n\n{{text}}\n\n## Your Task\n\nExtract the following
+      from the text above:\n\n1. **Entities**: Things mentioned in the text and their
+      types\n2. **Relationships**: How entities relate to each other\n3. **Attributes**:
+      Properties of entities (like quantities, descriptions, etc.)\n\n## Output Format\n\nReturn
+      ONLY valid JSON (no markdown, no code blocks, no backticks) with this structure:\n\n```\n{\n  \"entities\":
+      [\n    {\n      \"entity\": \"entity name as it appears in text\",\n      \"type\":
+      \"EntityType\"\n    }\n  ],\n  \"relationships\": [\n    {\n      \"subject\":
+      \"subject entity name\",\n      \"subject-type\": \"SubjectType\",\n      \"relation\":
+      \"relationship_name\",\n      \"object\": \"object entity name\",\n      \"object-type\":
+      \"ObjectType\"\n    }\n  ],\n  \"attributes\": [\n    {\n      \"entity\": \"entity
+      name\",\n      \"entity-type\": \"EntityType\",\n      \"attribute\": \"attribute_name\",\n      \"value\":
+      \"literal value\"\n    }\n  ]\n}\n```\n\n## Important Rules\n\n1. **Entity names**:
+      Use the exact text as it appears (e.g., \"Cornish pasty\", \"beef\")\n2. **Types**:
+      Use the EXACT type identifiers from the schema above (e.g., \"fo/Recipe\", \"fo/Food\")\n3.
+      **Relationships**: Use the EXACT relationship names from the schema (e.g., \"fo/has_ingredient\")\n4.
+      **Attributes**: Use the EXACT attribute names from the schema (e.g., \"fo/serves\")\n5.
+      **Type disambiguation**: If the same entity name appears with different types,
+      list it separately for each type\n6. **All arrays can be empty** if nothing
+      is found\n\n## Example\n\nInput text: \"Cornish pasty is a savory pastry filled
+      with beef and potatoes. This recipe serves 4 people.\"\n\nExpected output:\n{\n  \"entities\":
+      [\n    {\n      \"entity\": \"Cornish pasty\",\n      \"type\": \"fo/Recipe\"\n    },\n    {\n      \"entity\":
+      \"beef\",\n      \"type\": \"fo/Food\"\n    },\n    {\n      \"entity\": \"potatoes\",\n      \"type\":
+      \"fo/Food\"\n    }\n  ],\n  \"relationships\": [\n    {\n      \"subject\":
+      \"Cornish pasty\",\n      \"subject-type\": \"fo/Recipe\",\n      \"relation\":
+      \"fo/has_ingredient\",\n      \"object\": \"beef\",\n      \"object-type\":
+      \"fo/Food\"\n    },\n    {\n      \"subject\": \"Cornish pasty\",\n      \"subject-type\":
+      \"fo/Recipe\",\n      \"relation\": \"fo/has_ingredient\",\n      \"object\":
+      \"potatoes\",\n      \"object-type\": \"fo/Food\"\n    }\n  ],\n  \"attributes\":
+      [\n    {\n      \"entity\": \"Cornish pasty\",\n      \"entity-type\": \"fo/Recipe\",\n      \"attribute\":
+      \"fo/serves\",\n      \"value\": \"4 people\"\n    }\n  ]\n}\n\nNow extract
+      entities, relationships, and attributes from the text above.\n", "response-type":
+      "json"}, "template.graphql-generation": {"prompt": "You are a GraphQL query
+      generation expert. Given a natural language question and provided database schemas,
+      generate a valid GraphQL query embedded in valid JSON.\n\n## Question:\n{{ question
+      }}\n\n## Provided Schemas:\n{% for schema in schemas %}\n**{{ schema.name }}**:
+      {{ schema.description }}\nFields:\n{% for field in schema.fields %}- {{ field.name
+      }} ({{ field.type }}){% if field.description %}: {{ field.description }}{% endif
+      %}{% if field.primary_key %} [PRIMARY KEY]{% endif %}{% if field.required %}
+      [REQUIRED]{% endif %}{% if field.indexed %} [INDEXED]{% endif %}{% if field.enum_values
+      %} [OPTIONS: {{ field.enum_values|join('', '') }}]{% endif %}\n{% endfor %}\n{%
+      endfor %}\n\n## GraphQL Query Rules:\n1. Use the schema names as GraphQL query
+      fields (e.g., `customers`, `orders`)\n2. Apply filters using the `where` parameter
+      with nested filter objects\n3. Available filter operators per field type:\n   -
+      String fields: `eq`, `contains`, `startsWith`, `endsWith`, `in`, `not`, `not_in`\n   -
+      Integer/Float fields: `eq`, `gt`, `gte`, `lt`, `lte`, `in`, `not`, `not_in`\n4.
+      Use `order_by` for sorting (field name as string)\n5. Use `direction` for sort
+      direction: `ASC` or `DESC`\n6. Use `limit` to restrict number of results\n7.
+      Select specific fields in the query body\n\n## Task Instructions:\n1. Analyze
+      the question to identify:\n   - What data to retrieve (which fields to select)\n   -
+      What filters to apply (where conditions)\n   - What sorting is needed (order_by,
+      direction)\n   - How many results (limit)\n\n2. Generate a GraphQL query that:\n   -
+      Uses only the provided schema names and field names\n   - Applies appropriate
+      filters based on the question\n   - Selects relevant fields for the response\n   -
+      Includes reasonable limits (default 100 if not specified)\n\n3. If variables
+      are needed, include them in the response\n\n## Output Format:\nReturn ONLY a
+      valid JSON object (no markdown, no code blocks) with these fields:\n- \"query\":
+      the GraphQL query string\n- \"variables\": object with any GraphQL variables
+      (empty object if none)\n- \"confidence\": float between 0.0-1.0 indicating confidence
+      in the query\n\nImportant: Return raw JSON only, with no markdown formatting,
+      no code blocks, and no backticks.\n\n## Examples:\n\nQuestion: \"Show me customers
+      from California\"\n{\"query\": \"query { customers(where: {state: {eq: \\\"California\\\"}},
+      limit: 100) { customer_id name email state } }\", \"variables\": {}, \"confidence\":
+      0.92}\n\nQuestion: \"Top 10 products by price\"\n{\"query\": \"query { products(order_by:
+      \\\"price\\\", direction: DESC, limit: 10) { product_id name price category
+      } }\", \"variables\": {}, \"confidence\": 0.88}\n\nQuestion: \"Recent orders
+      over $100\"\n{\"query\": \"query { orders(where: {total_amount: {gt: 100}, order_date:
+      {gte: \\\"2024-01-01\\\"}}, order_by: \\\"order_date\\\", direction: DESC, limit:
+      50) { order_id customer_id total_amount order_date status } }\", \"variables\":
+      {}, \"confidence\": 0.96}\n\nNow generate the GraphQL query for the question
+      above.\n", "response-type": "json", "schema": {"additionalProperties": false,
+      "properties": {"confidence": {"description": "Float between 0.0-1.0 indicating
+      confidence in the generated query", "maximum": 1, "minimum": 0, "type": "number"},
+      "query": {"description": "The GraphQL query string generated to answer the question",
+      "type": "string"}, "variables": {"additionalProperties": true, "description":
+      "Object containing any GraphQL variables needed for the query", "type": "object"}},
+      "required": ["query", "variables", "confidence"], "type": "object"}}, "template.kg-prompt":
+      {"prompt": "Study the following set of knowledge statements. The statements
+      are written in Cypher format that has been extracted from a knowledge graph.
+      Use only the provided set of knowledge statements in your response. Do not speculate
+      if the answer is not found in the provided set of knowledge statements.\n\nHere''s
+      the knowledge statements:\n{% for edge in knowledge %}({{edge.s}})-[{{edge.p}}]->({{edge.o}})\n{%endfor%}\n\nUse
       only the provided knowledge statements to respond to the following:\n{{query}}\n",
       "response-type": "text"}, "template.question": {"prompt": "{{question}}"}, "template.schema-selection":
       {"prompt": "You are a database schema selection expert. Given a natural language
@@ -3076,7 +3413,7 @@ items:
           - http://pulsar:8080
           - --config-file
           - /trustgraph/config.json
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: init-trustgraph
           resources:
             limits:
@@ -3121,7 +3458,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-extract-agent
           resources:
             limits:
@@ -3172,7 +3509,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-extract-definitions
           resources:
             limits:
@@ -3223,7 +3560,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-extract-objects
           resources:
             limits:
@@ -3274,7 +3611,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-extract-ontology
           resources:
             limits:
@@ -3325,7 +3662,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-extract-relationships
           resources:
             limits:
@@ -3374,7 +3711,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-manager
           resources:
             limits:
@@ -3423,7 +3760,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: kg-store
           resources:
             limits:
@@ -3472,7 +3809,15 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          - --object-store-endpoint
+          - garage:3900
+          - --object-store-access-key
+          - GK000000000000000000000001
+          - --object-store-secret-key
+          - b171f00be9be4c32c734f4c05fe64c527a8ab5eb823b376cfa8c2531f70fc427
+          - --object-store-region
+          - garage
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: librarian
           resources:
             limits:
@@ -3497,6 +3842,101 @@ items:
       targetPort: 8000
     selector:
       app: librarian
+- apiVersion: v1
+  data:
+    local-config.yaml: "auth_enabled: false\n\nserver:\n  http_listen_port: 3100\n\
+      \  grpc_listen_port: 9096\n  log_level: debug\n  grpc_server_max_concurrent_streams:\
+      \ 1000\n\ncommon:\n  instance_addr: 127.0.0.1\n  path_prefix: /tmp/loki\n  storage:\n\
+      \    filesystem:\n      chunks_directory: /tmp/loki/chunks\n      rules_directory:\
+      \ /tmp/loki/rules\n  replication_factor: 1\n  ring:\n    kvstore:\n      store:\
+      \ inmemory\n\nquery_range:\n  results_cache:\n    cache:\n      embedded_cache:\n\
+      \        enabled: true\n        max_size_mb: 100\n\nlimits_config:\n  metric_aggregation_enabled:\
+      \ true\n\nschema_config:\n  configs:\n    - from: 2020-10-24\n      store: tsdb\n\
+      \      object_store: filesystem\n      schema: v13\n      index:\n        prefix:\
+      \ index_\n        period: 24h\n\npattern_ingester:\n  enabled: true\n  metric_aggregation:\n\
+      \    loki_address: localhost:3100\n\nruler:\n  alertmanager_url: http://localhost:9093\n\
+      \nfrontend:\n  encoding: protobuf\n\n# By default, Loki will send anonymous,\
+      \ but uniquely-identifiable usage and configuration\n# analytics to Grafana\
+      \ Labs. These statistics are sent to https://stats.grafana.org/\n#\n# Statistics\
+      \ help us better understand how Loki is used, and they show us performance\n\
+      # levels for most users. This helps us prioritize features and documentation.\n\
+      # For more information on what's sent, look at\n# https://github.com/grafana/loki/blob/main/pkg/analytics/stats.go\n\
+      # Refer to the buildReport method to see what goes into a report.\n#\n# If you\
+      \ would like to disable reporting, uncomment the following lines:\nanalytics:\n\
+      \  reporting_enabled: false\n"
+  kind: ConfigMap
+  metadata:
+    name: loki-cfg
+    namespace: trustgraph
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: loki-data
+    namespace: trustgraph
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20G
+    storageClassName: tg
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: loki
+    name: loki
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: loki
+    template:
+      metadata:
+        labels:
+          app: loki
+      spec:
+        containers:
+        - image: docker.io/grafana/loki:3.6.2
+          name: loki
+          ports:
+          - containerPort: 3100
+            hostPort: 3100
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 256M
+            requests:
+              cpu: '0.1'
+              memory: 256M
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+          - mountPath: /etc/loki/
+            name: loki-cfg
+          - mountPath: /loki
+            name: loki-data
+        volumes:
+        - configMap:
+            name: loki-cfg
+          name: loki-cfg
+        - name: loki-data
+          persistentVolumeClaim:
+            claimName: loki-data
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: loki
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: http
+      port: 3100
+      targetPort: 3100
+    selector:
+      app: loki
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -3525,7 +3965,7 @@ items:
               secretKeyRef:
                 key: mcp-server-secret
                 name: mcp-server-secret
-          image: docker.io/trustgraph/trustgraph-mcp:1.6.5
+          image: docker.io/trustgraph/trustgraph-mcp:1.8.12
           name: mcp-server
           ports:
           - containerPort: 8000
@@ -3577,7 +4017,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: mcp-tool
           resources:
             limits:
@@ -3626,7 +4066,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: metering
           resources:
             limits:
@@ -3677,7 +4117,7 @@ items:
           - metering-rag
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: metering-rag
           resources:
             limits:
@@ -3702,86 +4142,6 @@ items:
       targetPort: 8000
     selector:
       app: metering-rag
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: minio-data
-    namespace: trustgraph
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 20G
-    storageClassName: tg
-- apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    labels:
-      app: minio
-    name: minio
-    namespace: trustgraph
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        app: minio
-    template:
-      metadata:
-        labels:
-          app: minio
-      spec:
-        containers:
-        - command:
-          - minio
-          - server
-          - /minio_data
-          - --console-address
-          - :9001
-          env:
-          - name: MINIO_ROOT_PASSWORD
-            value: minioadmin
-          - name: MINIO_ROOT_USER
-            value: minioadmin
-          image: docker.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
-          name: minio
-          ports:
-          - containerPort: 9000
-            hostPort: 9000
-          - containerPort: 9001
-            hostPort: 9001
-          resources:
-            limits:
-              cpu: '0.5'
-              memory: 128M
-            requests:
-              cpu: '0.25'
-              memory: 128M
-          securityContext:
-            runAsGroup: 0
-            runAsUser: 0
-          volumeMounts:
-          - mountPath: /minio_data
-            name: minio-data
-        volumes:
-        - name: minio-data
-          persistentVolumeClaim:
-            claimName: minio-data
-- apiVersion: v1
-  kind: Service
-  metadata:
-    name: minio
-    namespace: trustgraph
-  spec:
-    ports:
-    - name: api
-      port: 9000
-      targetPort: 9000
-    - name: console
-      port: 9001
-      targetPort: 9001
-    selector:
-      app: minio
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -3806,7 +4166,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: nlp-query
           resources:
             limits:
@@ -3855,7 +4215,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: pdf-decoder
           resources:
             limits:
@@ -3981,7 +4341,7 @@ items:
           app: prometheus
       spec:
         containers:
-        - image: docker.io/prom/prometheus:v3.5.0
+        - image: docker.io/prom/prometheus:v3.8.0
           name: prometheus
           ports:
           - containerPort: 9090
@@ -4046,7 +4406,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: prompt
           resources:
             limits:
@@ -4099,7 +4459,7 @@ items:
           - '1'
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: prompt-rag
           resources:
             limits:
@@ -4188,10 +4548,10 @@ items:
           resources:
             limits:
               cpu: '1'
-              memory: 400M
+              memory: 512M
             requests:
               cpu: '0.05'
-              memory: 400M
+              memory: 512M
           securityContext:
             runAsGroup: 0
             runAsUser: 0
@@ -4228,16 +4588,16 @@ items:
             http://pulsar:8080 --broker-service-url pulsar://pulsar:6650
           env:
           - name: PULSAR_MEM
-            value: -Xms256m -Xmx256m -XX:MaxDirectMemorySize=256m
+            value: -Xms128m -Xmx128m -XX:MaxDirectMemorySize=128m
           image: docker.io/apachepulsar/pulsar:4.1.0
           name: pulsar-init
           resources:
             limits:
               cpu: '1'
-              memory: 512M
+              memory: 256M
             requests:
               cpu: '0.05'
-              memory: 512M
+              memory: 256M
           securityContext:
             runAsGroup: 0
             runAsUser: 0
@@ -4266,7 +4626,7 @@ items:
           - bin/apply-config-from-env.py conf/bookkeeper.conf && exec bin/pulsar bookie
           env:
           - name: BOOKIE_MEM
-            value: -Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
+            value: -Xms256m -Xmx256m -XX:MaxDirectMemorySize=256m
           - name: advertisedAddress
             value: bookie
           - name: bookieId
@@ -4323,7 +4683,7 @@ items:
           - bin/apply-config-from-env.py conf/broker.conf && exec bin/pulsar broker
           env:
           - name: PULSAR_MEM
-            value: -Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
+            value: -Xms384m -Xmx384m -XX:MaxDirectMemorySize=384m
           - name: advertisedAddress
             value: pulsar
           - name: advertisedListeners
@@ -4498,7 +4858,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: query-doc-embeddings
           resources:
             limits:
@@ -4549,7 +4909,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: query-graph-embeddings
           resources:
             limits:
@@ -4600,7 +4960,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: query-objects
           resources:
             limits:
@@ -4651,7 +5011,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: query-triples
           resources:
             limits:
@@ -4702,7 +5062,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: store-doc-embeddings
           resources:
             limits:
@@ -4753,7 +5113,7 @@ items:
           - http://qdrant:6333
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: store-graph-embeddings
           resources:
             limits:
@@ -4804,7 +5164,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: store-objects
           resources:
             limits:
@@ -4855,7 +5215,7 @@ items:
           - cassandra
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: store-triples
           resources:
             limits:
@@ -4904,7 +5264,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: structured-diag
           resources:
             limits:
@@ -4953,7 +5313,7 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - DEBUG
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: structured-query
           resources:
             limits:
@@ -5017,7 +5377,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: text-completion
           resources:
             limits:
@@ -5083,7 +5443,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:1.6.5
+          image: docker.io/trustgraph/trustgraph-flow:1.8.12
           name: text-completion-rag
           resources:
             limits:
@@ -5126,7 +5486,7 @@ items:
           app: workbench-ui
       spec:
         containers:
-        - image: docker.io/trustgraph/workbench-ui:1.4.1
+        - image: docker.io/trustgraph/workbench-ui:1.4.4
           name: workbench-ui
           ports:
           - containerPort: 8888
