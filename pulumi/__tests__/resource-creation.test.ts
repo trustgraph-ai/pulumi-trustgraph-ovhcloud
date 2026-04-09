@@ -1,5 +1,27 @@
 import * as pulumi from "@pulumi/pulumi";
 
+// Mock @pulumi/kubernetes to avoid native module issues in test environment
+jest.mock('@pulumi/kubernetes', () => {
+    const pulumiSdk = jest.requireActual('@pulumi/pulumi');
+    return {
+        Provider: class extends pulumiSdk.ProviderResource {
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes', name, args, opts);
+            }
+        },
+        core: { v1: { Secret: class extends pulumiSdk.CustomResource {
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes:core/v1:Secret', name, args, opts);
+            }
+        }}},
+        yaml: { v2: { ConfigGroup: class extends pulumiSdk.CustomResource {
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes:yaml/v2:ConfigGroup', name, args, opts);
+            }
+        }}},
+    };
+});
+
 // Track created resources
 interface MockResource {
     type: string;
@@ -149,7 +171,7 @@ describe("Resource Creation Tests", () => {
         expect(cluster).toBeDefined();
         expect(cluster?.inputs.name).toBe("trustgraph-test-cluster");
         expect(cluster?.inputs.region).toBe("GRA11");
-        expect(cluster?.inputs.version).toBe("1.31");
+        expect(cluster?.inputs.version).toBe("1.34");
         expect(cluster?.inputs.serviceName).toBe("mock-service-id");
         
         // Test node pool
