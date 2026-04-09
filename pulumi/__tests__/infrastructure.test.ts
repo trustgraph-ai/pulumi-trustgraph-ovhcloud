@@ -1,5 +1,27 @@
 import * as pulumi from "@pulumi/pulumi";
 
+// Mock @pulumi/kubernetes to avoid native module issues in test environment
+jest.mock('@pulumi/kubernetes', () => {
+    const pulumiSdk = jest.requireActual('@pulumi/pulumi');
+    return {
+        Provider: class extends pulumiSdk.ProviderResource {
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes', name, args, opts);
+            }
+        },
+        core: { v1: { Secret: class extends pulumiSdk.CustomResource {
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes:core/v1:Secret', name, args, opts);
+            }
+        }}},
+        yaml: { v2: { ConfigGroup: class extends pulumiSdk.CustomResource {
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes:yaml/v2:ConfigGroup', name, args, opts);
+            }
+        }}},
+    };
+});
+
 // Mock the fs module before any imports that use it
 jest.mock('fs', () => ({
     readFileSync: jest.fn().mockImplementation((path) => {
