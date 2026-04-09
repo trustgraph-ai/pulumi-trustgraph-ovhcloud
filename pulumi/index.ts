@@ -23,8 +23,7 @@ const cluster = new ovh.cloudproject.Kube(
         serviceName: serviceName,
         name: prefix + "-cluster",
         region: region,
-        // FIXME: 1.33 is recommended
-        version: "1.31", // Using a stable version
+        version: "1.34",
     },
     { provider: provider }
 );
