@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@ovhcloud/pulumi-ovh": "^2.12.0",
+    "@pulumi/command": "^1.2.1",
+    "@pulumi/kubernetes": "^4.28.0",
+    "@pulumi/null": "^0.0.15",
+    "@pulumi/random": "^4.19.2",
+    "@pulumi/tls": "^5.3.1"
+  }
+}

@@ -1,0 +1,68 @@
+[
+    {
+        "name": "triple-store-cassandra",
+        "parameters": {}
+    },
+    {
+        "name": "row-store-cassandra",
+        "parameters": {}
+    },
+    {
+        "name": "vector-store-qdrant",
+        "parameters": {}
+    },
+    {
+        "name": "pulsar",
+        "parameters": {}
+    },
+    {
+        "name": "grafana",
+        "parameters": {}
+    },
+    {
+        "name": "trustgraph-base",
+        "parameters": {}
+    },
+    {
+        "name": "embeddings-fastembed",
+        "parameters": {}
+    },
+    {
+        "name": "openai",
+        "parameters": {
+            "max-output-tokens": 4096,
+	    "models": {
+		"type": "string",
+		"description": "LLM model to use",
+		"default": "Mistral-Small-3.2-24B-Instruct-2506",
+		"enum": [
+		    {
+			id: "Mistral-Small-3.2-24B-Instruct-2506",
+			description: "Mistral small 3.2 24b instruct (2506)"
+		    },
+		],
+		"required": true
+	    }
+        }
+    },
+    {
+       "name": "override",
+       "parameters": {
+           "cassandra-heap": "500M",
+           "cassandra-memory-limit": "2000M",
+           "cassandra-memory-reservation": "2000M",
+           "pulsar-bookie-memory-limit": "2048M",
+           "pulsar-bookie-memory-reservation": "2048M",
+           "pulsar-bookie-heap": "512m",
+           "pulsar-bookie-direct-memory": "512m",
+           "pulsar-broker-memory-limit": "1500M",
+           "pulsar-broker-memory-reservation": "1500M",
+           "pulsar-broker-heap": "512m",
+           "pulsar-broker-direct-memory": "512m",
+           "api-gateway-memory-limit": "768M",
+           "api-gateway-memory-reservation": "768M",
+           "librarian-memory-limit": "1024M",
+           "librarian-memory-reservation": "1024M"
+       }
+    }
+]
