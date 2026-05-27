@@ -193,16 +193,16 @@ describe("Resource Creation Tests", () => {
         
         // Test secrets
         const secrets = resources.filter(r => r.type === "kubernetes:core/v1:Secret");
-        expect(secrets.length).toBeGreaterThanOrEqual(3); // gateway-secret, mcp-server-secret, openai-credentials
-        
-        const gatewaySecret = secrets.find(s => s.inputs.metadata?.name === "gateway-secret");
-        expect(gatewaySecret).toBeDefined();
-        expect(gatewaySecret?.inputs.metadata.namespace).toBe("trustgraph");
-        
-        const mcpServerSecret = secrets.find(s => s.inputs.metadata?.name === "mcp-server-secret");
-        expect(mcpServerSecret).toBeDefined();
-        expect(mcpServerSecret?.inputs.metadata.namespace).toBe("trustgraph");
-        
+        expect(secrets.length).toBeGreaterThanOrEqual(3); // iam-bootstrap-token, grafana-secret, openai-credentials
+
+        const iamSecret = secrets.find(s => s.inputs.metadata?.name === "iam-bootstrap-token");
+        expect(iamSecret).toBeDefined();
+        expect(iamSecret?.inputs.metadata.namespace).toBe("trustgraph");
+
+        const grafanaSecret = secrets.find(s => s.inputs.metadata?.name === "grafana-secret");
+        expect(grafanaSecret).toBeDefined();
+        expect(grafanaSecret?.inputs.metadata.namespace).toBe("trustgraph");
+
         const aiSecret = secrets.find(s => s.inputs.metadata?.name === "openai-credentials");
         expect(aiSecret).toBeDefined();
         expect(aiSecret?.inputs.metadata.namespace).toBe("trustgraph");
