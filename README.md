@@ -171,6 +171,21 @@ This will allow you to access:
 - Workbench UI: http://localhost:8888
 - Grafana: http://localhost:3000
 
+The IAM bootstrap token and Grafana admin password are auto-generated
+by Pulumi.  After deployment, retrieve them with:
+```
+pulumi stack output iamToken --show-secrets
+pulumi stack output grafanaPassword --show-secrets
+```
+
+Login to Grafana with username `admin` and the password from the command
+above.
+
+To use the TrustGraph API with authentication:
+```
+export TRUSTGRAPH_TOKEN=$(pulumi stack output iamToken --show-secrets)
+```
+
 ## AI Endpoints Configuration
 
 The deployment automatically configures access to OVHcloud AI Endpoints. The AI
@@ -225,7 +240,7 @@ The AI model specified in the config.json should match the model in the
 AI endpoint hostname specified in the Pulumi config.
 
 ```
-./update-config  scw-k8s 2.2.24
+./update-config ovh-k8s 2.4.29
 ```
 
 ## Additional Resources

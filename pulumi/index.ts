@@ -1,9 +1,27 @@
 import * as ovh from '@ovhcloud/pulumi-ovh';
 import * as pulumi from '@pulumi/pulumi';
 import * as k8s from '@pulumi/kubernetes';
+import * as random from '@pulumi/random';
 import * as fs from 'fs';
 
 import { prefix, region, nodeSize, nodeCount, serviceName, aiEndpointsToken, aiEndpoint } from './config';
+
+const iamBootstrapToken = new random.RandomPassword(
+    "iam-bootstrap-token",
+    {
+        length: 32,
+        special: false,
+    },
+);
+
+const grafanaAdminPassword = new random.RandomPassword(
+    "grafana-admin-password",
+    {
+        length: 16,
+        special: true,
+        overrideSpecial: "!@#$%^&*",
+    },
+);
 
 // OVHcloud provider
 const provider = new ovh.Provider(
@@ -114,31 +132,29 @@ const appDeploy = new k8s.yaml.v2.ConfigGroup(
     { provider: k8sProvider }
 );
 
-// Generate an (empty) gateway secret - no authentication
-const gatewaySecret = new k8s.core.v1.Secret(
-    "gateway-secret",
+const iamSecret = new k8s.core.v1.Secret(
+    "iam-bootstrap-token",
     {
         metadata: {
-            name: "gateway-secret",
+            name: "iam-bootstrap-token",
             namespace: "trustgraph"
         },
         stringData: {
-            "gateway-secret": ""
+            "token": pulumi.interpolate`tg_${iamBootstrapToken.result}`,
         },
     },
     { provider: k8sProvider, dependsOn: appDeploy }
 );
 
-// Generate an (empty) gateway secret - no authentication
-const mcpServerSecret = new k8s.core.v1.Secret(
-    "mcp-server-secret",
+const grafanaSecret = new k8s.core.v1.Secret(
+    "grafana-secret",
     {
         metadata: {
-            name: "mcp-server-secret",
+            name: "grafana-secret",
             namespace: "trustgraph"
         },
         stringData: {
-            "mcp-server-secret": ""
+            "password": grafanaAdminPassword.result,
         },
     },
     { provider: k8sProvider, dependsOn: appDeploy }
@@ -173,4 +189,8 @@ export const clusterEndpoint = cluster.kubeconfig.apply(k => {
     }
 });
 export const aiUrl = aiEndpointUrl;
+
+export const iamToken = pulumi.interpolate`tg_${iamBootstrapToken.result}`;
+
+export const grafanaPassword = grafanaAdminPassword.result;
 
