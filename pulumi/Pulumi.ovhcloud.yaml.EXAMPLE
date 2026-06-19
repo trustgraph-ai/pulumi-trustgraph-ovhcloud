@@ -9,3 +9,6 @@ config:
   trustgraph-ovhcloud:node-count: "3"
   trustgraph-ovhcloud:ai-endpoints-token:
     secure: v1:cVwSu8UOZ9dyqWM+:MsWrAHXtPsONiop178ZWntXqFsiB1l5tcDLLa3k9w5mcmQ4d1I5nH+wlcQ==
+  trustgraph-ovhcloud:domain: app.example.com
+  trustgraph-ovhcloud:grafana-domain: grafana.example.com
+  trustgraph-ovhcloud:letsencrypt-email: admin@example.com

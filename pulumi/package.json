@@ -5,18 +5,17 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "@ovhcloud/pulumi-ovh": "^2.12.0",
-    "@pulumi/command": "^1.2.1",
-    "@pulumi/kubernetes": "^4.28.0",
-    "@pulumi/null": "^0.0.15",
-    "@pulumi/random": "^4.19.2",
-    "@pulumi/tls": "^5.3.1"
+    "@ovhcloud/pulumi-ovh": "^2.13.0",
+    "@pulumi/kubernetes": "^4.31.1",
+    "@pulumi/null": "^0.2.0",
+    "@pulumi/pulumi": "^3.245.0",
+    "@pulumi/random": "^4.21.0",
+    "@pulumi/tls": "^5.5.0"
   },
   "devDependencies": {
-    "@pulumi/pulumi": "^3.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^14",
-    "jest": "^30.0.4",
-    "ts-jest": "^29.4.0"
+    "@types/node": "^25.9.1",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11"
   }
 }

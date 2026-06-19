@@ -1,5 +1,3 @@
-// Configuration stuff, largely loading stuff from the configuration file
-
 import * as pulumi from "@pulumi/pulumi";
 
 const cfg = new pulumi.Config();
@@ -37,3 +35,8 @@ export const aiEndpoint = cfg.require("ai-endpoint");
 
 // AI Endpoints access token - get this from https://endpoints.ai.cloud.ovh.net/
 export const aiEndpointsToken = cfg.getSecret("ai-endpoints-token") || "YOUR_AI_ENDPOINTS_TOKEN";
+
+// Gateway configuration
+export const domain = cfg.require("domain");
+export const grafanaDomain = cfg.require("grafana-domain");
+export const letsencryptEmail = cfg.require("letsencrypt-email");

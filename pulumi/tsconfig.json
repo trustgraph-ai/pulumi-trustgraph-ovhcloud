@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "strict": true,
+        "ignoreDeprecations": "6.0",
         "outDir": "bin",
         "target": "es2016",
         "module": "commonjs",
@@ -14,8 +15,7 @@
         "types": ["node", "jest"]
     },
     "include": [
-        "index.ts",
-        "config.ts",
+        "*.ts",
         "__tests__/**/*.ts"
     ],
     "exclude": [
