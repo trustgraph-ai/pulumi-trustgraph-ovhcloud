@@ -9,16 +9,55 @@ jest.mock('@pulumi/kubernetes', () => {
                 super('kubernetes', name, args, opts);
             }
         },
-        core: { v1: { Secret: class extends pulumiSdk.CustomResource {
-            constructor(name: string, args?: any, opts?: any) {
-                super('kubernetes:core/v1:Secret', name, args, opts);
-            }
-        }}},
+        core: { v1: {
+            Namespace: class extends pulumiSdk.CustomResource {
+                constructor(name: string, args?: any, opts?: any) {
+                    super('kubernetes:core/v1:Namespace', name, args, opts);
+                }
+            },
+            Secret: class extends pulumiSdk.CustomResource {
+                constructor(name: string, args?: any, opts?: any) {
+                    super('kubernetes:core/v1:Secret', name, args, opts);
+                }
+            },
+            Service: {
+                get: (name: string, id: any, opts?: any) => {
+                    const res = new (class extends pulumiSdk.CustomResource {
+                        public readonly status: any;
+                        constructor() {
+                            super('kubernetes:core/v1:Service', name, {}, opts);
+                            this.status = pulumiSdk.output({
+                                loadBalancer: { ingress: [{ ip: "1.2.3.4" }] }
+                            });
+                        }
+                    })();
+                    return res;
+                },
+            },
+        }},
         yaml: { v2: { ConfigGroup: class extends pulumiSdk.CustomResource {
             constructor(name: string, args?: any, opts?: any) {
                 super('kubernetes:yaml/v2:ConfigGroup', name, args, opts);
             }
         }}},
+        helm: { v4: { Chart: class extends pulumiSdk.ComponentResource {
+            public readonly resources: any;
+            constructor(name: string, args?: any, opts?: any) {
+                super('kubernetes:helm.sh/v4:Chart', name, {}, opts);
+                this.resources = pulumiSdk.output([]);
+                this.registerOutputs({ resources: this.resources });
+            }
+        }}},
+        apiextensions: { CustomResource: class extends pulumiSdk.CustomResource {
+            constructor(name: string, args?: any, opts?: any) {
+                const apiVersion = args?.apiVersion || '';
+                const kind = args?.kind || '';
+                const type = apiVersion && kind
+                    ? `kubernetes:${apiVersion.replace('/', '.')}:${kind}`
+                    : 'kubernetes:apiextensions:CustomResource';
+                super(type, name, args, opts);
+            }
+        }},
     };
 });
 
@@ -30,9 +69,7 @@ jest.mock('fs', () => ({
         }
         return '';
     }),
-    writeFile: jest.fn().mockImplementation((path, data, cb) => {
-        if (cb) cb(null);
-    })
+    writeFile: jest.fn()
 }));
 
 describe("Infrastructure Tests", () => {
@@ -42,16 +79,17 @@ describe("Infrastructure Tests", () => {
         // Set up the mocks
         pulumi.runtime.setMocks({
             newResource: function(args: pulumi.runtime.MockResourceArgs): {id: string, state: any} {
-                // Return mock resource
                 return {
                     id: args.name + "_id",
                     state: {
                         ...args.inputs,
-                        // Add specific outputs for resources that need them
-                        ...(args.type === "ovhcloud:cloudproject/kube:Kube" ? {
+                        ...(args.type === "ovhcloud:cloudproject/kube:Kube" || args.type === "ovh:CloudProject/kube:Kube" ? {
                             kubeconfig: JSON.stringify({
                                 clusters: [{ cluster: { server: "https://mock.ovh.net" } }]
                             })
+                        } : {}),
+                        ...(args.type === "kubernetes:core/v1:Service" ? {
+                            status: { loadBalancer: { ingress: [{ ip: "1.2.3.4" }] } }
                         } : {})
                     },
                 };
@@ -68,24 +106,23 @@ describe("Infrastructure Tests", () => {
             "project:service-name": "mock-service-id",
             "project:ai-endpoint": "mistral-nemo-instruct-2407.endpoints.kepler.ai.cloud.ovh.net",
             "project:ai-endpoints-token": "mock-token",
+            "project:domain": "ovh1.dev.trustgraph.ai",
+            "project:grafana-domain": "grafana.ovh1.dev.trustgraph.ai",
+            "project:letsencrypt-email": "admin@trustgraph.ai",
         });
     });
 
     test("should create infrastructure and export values", async () => {
-        // Import the infrastructure module
         infraModule = await import("../index");
 
-        // Test that exports are defined
         expect(infraModule.clusterId).toBeDefined();
         expect(infraModule.clusterEndpoint).toBeDefined();
         expect(infraModule.aiUrl).toBeDefined();
     });
 
     test("should have valid AI URL format", async () => {
-        // The aiUrl should be a Pulumi Output
         expect(infraModule.aiUrl).toBeDefined();
-        
-        // In test mode, Outputs are wrapped but we can verify they exist
+
         const urlString = infraModule.aiUrl.toString();
         expect(urlString).toContain("Output");
     });

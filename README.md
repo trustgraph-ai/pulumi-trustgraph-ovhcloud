@@ -7,11 +7,11 @@ This is an installation of TrustGraph on OVHcloud using the Managed Kubernetes S
 The full stack includes:
 
 - A managed Kubernetes cluster in OVHcloud
-- Node pool containing 2 nodes (configurable)
-- Private network with subnet configuration
+- Node pool containing 4 nodes (configurable)
 - Service account and credentials for AI access
 - Deploys a complete TrustGraph stack of resources in MKS
 - Integration with OVHcloud AI Endpoints
+- HTTPS gateway with TLS via Let's Encrypt for TrustGraph UI and Grafana
 
 Keys and other configuration for the AI components are configured into
 TrustGraph using Kubernetes secrets.
@@ -35,6 +35,7 @@ Roadmap to deploy:
 - Configure your environment with OVHcloud credentials
 - Modify the local configuration to do what you want
 - Deploy
+- Point DNS at the gateway load balancer
 - Use the system
 
 ## Prerequisites
@@ -111,6 +112,9 @@ Edit `Pulumi.ovhcloud.yaml` and update the following values:
 - `trustgraph-ovhcloud:node-size` - Node flavor (default: b2-15)
 - `trustgraph-ovhcloud:node-count` - Number of nodes (default: 2)
 - `trustgraph-ovhcloud:ai-endpoints-token` - Your AI Endpoints access token (encrypted)
+- `trustgraph-ovhcloud:domain` - Domain name for TrustGraph UI (e.g., ovh1.dev.trustgraph.ai)
+- `trustgraph-ovhcloud:grafana-domain` - Domain name for Grafana (e.g., grafana.ovh1.dev.trustgraph.ai)
+- `trustgraph-ovhcloud:letsencrypt-email` - Email for Let's Encrypt certificate notifications
 
 Available node flavors:
 - `b2-7` - 2 vCPUs, 7GB RAM
@@ -145,6 +149,7 @@ If everything works:
 - A file `kube.cfg` will be created which provides access to the Kubernetes cluster
 - The TrustGraph application will be deployed to the cluster
 - AI credentials will be configured automatically
+- An HTTPS gateway with TLS certificates will be provisioned
 
 To connect to the Kubernetes cluster:
 
@@ -155,20 +160,41 @@ kubectl --kubeconfig kube.cfg -n trustgraph get pods
 If something goes wrong while deploying, retry before giving up.
 `pulumi up` is a retryable command and will continue from where it left off.
 
+### Gateway and DNS Configuration
+
+After deployment, the Nginx Gateway Fabric creates a load balancer with an
+external IP. Point your DNS records at this IP:
+
+- `domain` (e.g., ovh1.dev.trustgraph.ai) → Load balancer IP
+- `grafana-domain` (e.g., grafana.ovh1.dev.trustgraph.ai) → Load balancer IP
+
+To find the load balancer IP:
+
+```bash
+kubectl --kubeconfig kube.cfg -n nginx-gateway get svc
+```
+
+Once DNS propagates, Let's Encrypt will automatically issue TLS certificates
+via the HTTP-01 challenge.
+
 ## Use the System
 
-To access TrustGraph services, set up port-forwarding. You'll need multiple
-terminal windows to run each of these commands:
+Once DNS is configured, access the services directly via HTTPS:
+
+- TrustGraph UI: https://your-domain
+- Grafana: https://your-grafana-domain
+
+For local access without DNS, use port-forwarding:
 
 ```bash
 kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/api-gateway 8088:8088
-kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/workbench-ui 8888:8888
+kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/trustgraph-ui 8888:8888
 kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/grafana 3000:3000
 ```
 
 This will allow you to access:
 - API Gateway: http://localhost:8088
-- Workbench UI: http://localhost:8888
+- TrustGraph UI: http://localhost:8888
 - Grafana: http://localhost:3000
 
 The IAM bootstrap token and Grafana admin password are auto-generated
@@ -240,7 +266,7 @@ The AI model specified in the config.json should match the model in the
 AI endpoint hostname specified in the Pulumi config.
 
 ```
-./update-config ovh-k8s 2.4.29
+./update-config ovh-k8s 2.5.16
 ```
 
 ## Additional Resources
